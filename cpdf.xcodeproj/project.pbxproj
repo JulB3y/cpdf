@@ -1,0 +1,554 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		579F8BBE2D398C7100A5F52B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 579F8BA42D398C7000A5F52B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 579F8BAB2D398C7000A5F52B;
+			remoteInfo = cpdf;
+		};
+		579F8BC82D398C7100A5F52B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 579F8BA42D398C7000A5F52B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 579F8BAB2D398C7000A5F52B;
+			remoteInfo = cpdf;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		579F8BAC2D398C7000A5F52B /* cpdf.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = cpdf.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		579F8BBD2D398C7100A5F52B /* cpdfTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = cpdfTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		579F8BC72D398C7100A5F52B /* cpdfUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = cpdfUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		579F8BAE2D398C7000A5F52B /* cpdf */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = cpdf;
+			sourceTree = "<group>";
+		};
+		579F8BC02D398C7100A5F52B /* cpdfTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = cpdfTests;
+			sourceTree = "<group>";
+		};
+		579F8BCA2D398C7100A5F52B /* cpdfUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = cpdfUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		579F8BA92D398C7000A5F52B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		579F8BBA2D398C7100A5F52B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		579F8BC42D398C7100A5F52B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		579F8BA32D398C7000A5F52B = {
+			isa = PBXGroup;
+			children = (
+				579F8BAE2D398C7000A5F52B /* cpdf */,
+				579F8BC02D398C7100A5F52B /* cpdfTests */,
+				579F8BCA2D398C7100A5F52B /* cpdfUITests */,
+				579F8BAD2D398C7000A5F52B /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		579F8BAD2D398C7000A5F52B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				579F8BAC2D398C7000A5F52B /* cpdf.app */,
+				579F8BBD2D398C7100A5F52B /* cpdfTests.xctest */,
+				579F8BC72D398C7100A5F52B /* cpdfUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		579F8BAB2D398C7000A5F52B /* cpdf */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 579F8BD12D398C7100A5F52B /* Build configuration list for PBXNativeTarget "cpdf" */;
+			buildPhases = (
+				579F8BA82D398C7000A5F52B /* Sources */,
+				579F8BA92D398C7000A5F52B /* Frameworks */,
+				579F8BAA2D398C7000A5F52B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				579F8BAE2D398C7000A5F52B /* cpdf */,
+			);
+			name = cpdf;
+			packageProductDependencies = (
+			);
+			productName = cpdf;
+			productReference = 579F8BAC2D398C7000A5F52B /* cpdf.app */;
+			productType = "com.apple.product-type.application";
+		};
+		579F8BBC2D398C7100A5F52B /* cpdfTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 579F8BD42D398C7100A5F52B /* Build configuration list for PBXNativeTarget "cpdfTests" */;
+			buildPhases = (
+				579F8BB92D398C7100A5F52B /* Sources */,
+				579F8BBA2D398C7100A5F52B /* Frameworks */,
+				579F8BBB2D398C7100A5F52B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				579F8BBF2D398C7100A5F52B /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				579F8BC02D398C7100A5F52B /* cpdfTests */,
+			);
+			name = cpdfTests;
+			packageProductDependencies = (
+			);
+			productName = cpdfTests;
+			productReference = 579F8BBD2D398C7100A5F52B /* cpdfTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		579F8BC62D398C7100A5F52B /* cpdfUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 579F8BD72D398C7100A5F52B /* Build configuration list for PBXNativeTarget "cpdfUITests" */;
+			buildPhases = (
+				579F8BC32D398C7100A5F52B /* Sources */,
+				579F8BC42D398C7100A5F52B /* Frameworks */,
+				579F8BC52D398C7100A5F52B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				579F8BC92D398C7100A5F52B /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				579F8BCA2D398C7100A5F52B /* cpdfUITests */,
+			);
+			name = cpdfUITests;
+			packageProductDependencies = (
+			);
+			productName = cpdfUITests;
+			productReference = 579F8BC72D398C7100A5F52B /* cpdfUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		579F8BA42D398C7000A5F52B /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					579F8BAB2D398C7000A5F52B = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					579F8BBC2D398C7100A5F52B = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 579F8BAB2D398C7000A5F52B;
+					};
+					579F8BC62D398C7100A5F52B = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 579F8BAB2D398C7000A5F52B;
+					};
+				};
+			};
+			buildConfigurationList = 579F8BA72D398C7000A5F52B /* Build configuration list for PBXProject "cpdf" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 579F8BA32D398C7000A5F52B;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 579F8BAD2D398C7000A5F52B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				579F8BAB2D398C7000A5F52B /* cpdf */,
+				579F8BBC2D398C7100A5F52B /* cpdfTests */,
+				579F8BC62D398C7100A5F52B /* cpdfUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		579F8BAA2D398C7000A5F52B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		579F8BBB2D398C7100A5F52B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		579F8BC52D398C7100A5F52B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		579F8BA82D398C7000A5F52B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		579F8BB92D398C7100A5F52B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		579F8BC32D398C7100A5F52B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		579F8BBF2D398C7100A5F52B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 579F8BAB2D398C7000A5F52B /* cpdf */;
+			targetProxy = 579F8BBE2D398C7100A5F52B /* PBXContainerItemProxy */;
+		};
+		579F8BC92D398C7100A5F52B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 579F8BAB2D398C7000A5F52B /* cpdf */;
+			targetProxy = 579F8BC82D398C7100A5F52B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		579F8BCF2D398C7100A5F52B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.1;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		579F8BD02D398C7100A5F52B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		579F8BD22D398C7100A5F52B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = cpdf/cpdf.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"cpdf/Preview Content\"";
+				DEVELOPMENT_TEAM = 44UX2TWV97;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.julbey.cpdf;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		579F8BD32D398C7100A5F52B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = cpdf/cpdf.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"cpdf/Preview Content\"";
+				DEVELOPMENT_TEAM = 44UX2TWV97;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.julbey.cpdf;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		579F8BD52D398C7100A5F52B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 44UX2TWV97;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.julbey.cpdfTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/cpdf.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/cpdf";
+			};
+			name = Debug;
+		};
+		579F8BD62D398C7100A5F52B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 44UX2TWV97;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.julbey.cpdfTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/cpdf.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/cpdf";
+			};
+			name = Release;
+		};
+		579F8BD82D398C7100A5F52B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 44UX2TWV97;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.julbey.cpdfUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = cpdf;
+			};
+			name = Debug;
+		};
+		579F8BD92D398C7100A5F52B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 44UX2TWV97;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.julbey.cpdfUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = cpdf;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		579F8BA72D398C7000A5F52B /* Build configuration list for PBXProject "cpdf" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				579F8BCF2D398C7100A5F52B /* Debug */,
+				579F8BD02D398C7100A5F52B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		579F8BD12D398C7100A5F52B /* Build configuration list for PBXNativeTarget "cpdf" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				579F8BD22D398C7100A5F52B /* Debug */,
+				579F8BD32D398C7100A5F52B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		579F8BD42D398C7100A5F52B /* Build configuration list for PBXNativeTarget "cpdfTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				579F8BD52D398C7100A5F52B /* Debug */,
+				579F8BD62D398C7100A5F52B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		579F8BD72D398C7100A5F52B /* Build configuration list for PBXNativeTarget "cpdfUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				579F8BD82D398C7100A5F52B /* Debug */,
+				579F8BD92D398C7100A5F52B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 579F8BA42D398C7000A5F52B /* Project object */;
+}
