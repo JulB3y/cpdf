@@ -12,7 +12,7 @@ struct CompressedPDFView: View {
     
     var body: some View {
         VStack(spacing: 30) {
-            Text("PDF Komprimierung")
+            Text(LocalizedStringKey("PDF Komprimierung"))
                 .font(.title)
                 .foregroundColor(.primary)
             
@@ -57,7 +57,7 @@ struct CompressedPDFView: View {
                         .padding(.bottom, 4)
                     
                     VStack(spacing: 2) {
-                        Text("reduziert um")
+                        Text(LocalizedStringKey("reduziert um"))
                             .font(.caption)
                             .foregroundColor(.secondary)
                         
@@ -101,7 +101,7 @@ struct CompressedPDFView: View {
             }
             .padding()
             
-            Button("Neue PDF komprimieren") {
+            Button(LocalizedStringKey("Neue PDF komprimieren")) {
                 pdfCompressor.compressionResult = nil
             }
             .buttonStyle(.borderedProminent)
@@ -119,6 +119,7 @@ struct CompressedPDFView: View {
         }
     }
     
+    // Berechnung der Einsparung in Prozent
     private var savings: Double {
         Double(originalSize - compressedSize) / Double(originalSize) * 100
     }
@@ -141,33 +142,36 @@ struct CompressedPDFView: View {
                 }
                 
                 let pageRect = pdfPage.bounds(for: .mediaBox)
-                let thumbnail = NSImage(size: pageRect.size)
                 
+                // Berechne das Seitenverhältnis und die Thumbnail-Größe
+                let aspectRatio = pageRect.width / pageRect.height
+                let thumbnailHeight: CGFloat = 100
+                let thumbnailWidth = thumbnailHeight * aspectRatio
+                let thumbnailSize = NSSize(width: thumbnailWidth, height: thumbnailHeight)
+                
+                // Erstelle das Thumbnail
+                let thumbnail = NSImage(size: thumbnailSize)
                 thumbnail.lockFocus()
                 
                 if let context = NSGraphicsContext.current {
+                    // Setze Qualitätseinstellungen
+                    context.imageInterpolation = .high
+                    context.shouldAntialias = true
+                    
                     // Weißer Hintergrund
-                    NSColor.white.set()
-                    NSBezierPath(rect: NSRect(origin: .zero, size: pageRect.size)).fill()
+                    NSColor.white.setFill()
+                    NSRect(origin: .zero, size: thumbnailSize).fill()
                     
-                    // PDF-Seite zeichnen mit dem CGContext
+                    // Berechne die Skalierung
+                    let scale = thumbnailHeight / pageRect.height
+                    context.cgContext.scaleBy(x: scale, y: scale)
+                    
+                    // Zeichne die PDF-Seite
                     pdfPage.draw(with: .mediaBox, to: context.cgContext)
-                    thumbnail.unlockFocus()
-                    
-                    // Skaliere das Thumbnail auf eine vernünftige Größe
-                    let scaledThumbnail = NSImage(size: NSSize(width: 200, height: 200))
-                    scaledThumbnail.lockFocus()
-                    thumbnail.draw(in: NSRect(origin: .zero, size: scaledThumbnail.size),
-                                 from: NSRect(origin: .zero, size: thumbnail.size),
-                                 operation: .copy,
-                                 fraction: 1.0)
-                    scaledThumbnail.unlockFocus()
-                    
-                    continuation.resume(returning: scaledThumbnail)
-                } else {
-                    thumbnail.unlockFocus()
-                    continuation.resume(returning: fallbackImage)
                 }
+                
+                thumbnail.unlockFocus()
+                continuation.resume(returning: thumbnail)
             }
         }
     }

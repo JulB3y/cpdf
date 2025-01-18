@@ -21,17 +21,18 @@ struct cpdfApp: App {
             UserDefaults.standard.set(languageCode, forKey: "AppleLocale")
             UserDefaults.standard.synchronize()
             
-            // Erzwinge einen Neustart der App-Sprache
-            Bundle.main.localizations
+            // Debug-Ausgaben
+            print("📦 Verfügbare Lokalisierungen: \(Bundle.main.localizations)")
+            print("🔍 Aktuelle Locale: \(Locale.current.identifier)")
             
-            if let languageBundle = Bundle.main.path(forResource: languageCode, ofType: "lproj") {
-                print("📂 Gefundener Sprachpfad: \(languageBundle)")
-                if let bundle = Bundle(path: languageBundle) {
-                    bundle.load()
-                    print("✅ Sprachbundle geladen")
-                }
+            // Versuche das Bundle zu laden
+            if let bundlePath = Bundle.main.path(forResource: languageCode, ofType: "lproj"),
+               let bundle = Bundle(path: bundlePath) {
+                print("✅ Sprachbundle gefunden und geladen: \(bundlePath)")
+                bundle.load()
             } else {
                 print("❌ Sprachbundle nicht gefunden für: \(languageCode)")
+                print("📂 Suchpfad: \(Bundle.main.bundlePath)")
             }
         }
     }

@@ -1,3 +1,10 @@
+/* 
+  Localizable.strings
+  cpdf
+
+  Created by Julius Beyer on 18.01.25.
+  
+*/
 "PDF hier reinziehen" = "PDF hier reinziehen";
 "oder" = "oder";
 "PDF auswählen" = "PDF auswählen";
@@ -13,4 +20,4 @@
 "Jetzt neustarten" = "Jetzt neustarten";
 "Bitte starten Sie die App neu, damit die Sprachänderungen wirksam werden." = "Bitte starten Sie die App neu, damit die Sprachänderungen wirksam werden.";
 "Einstellungen" = "Einstellungen";
-"Beenden" = "Beenden"; 
+"Beenden" = "Beenden";

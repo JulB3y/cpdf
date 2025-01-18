@@ -1,21 +1,6 @@
 import SwiftUI
 import Foundation
 
-// Language-Enumeration direkt in der Datei
-enum Language: String, CaseIterable, Identifiable {
-    case german = "de"
-    case english = "en"
-    
-    var id: String { self.rawValue }
-    
-    var displayName: String {
-        switch self {
-        case .german: return "Deutsch"
-        case .english: return "English"
-        }
-    }
-}
-
 struct SettingsView: View {
     @AppStorage("compressionQuality") private var compressionQuality = 0.5
     @AppStorage("appLanguage") private var appLanguage = Language.german.rawValue
@@ -24,21 +9,26 @@ struct SettingsView: View {
     
     var body: some View {
         Form {
-            Section(LocalizedStringKey("Sprache / Language")) {
+            Section {
                 Picker(LocalizedStringKey("Sprache"), selection: $selectedLanguage) {
                     ForEach(Language.allCases) { language in
                         Text(language.displayName).tag(language)
                     }
                 }
-                .onChange(of: selectedLanguage) { newValue in
+                .onChange(of: selectedLanguage) { oldValue, newValue in
                     if appLanguage != newValue.rawValue {
                         appLanguage = newValue.rawValue
                         showingRestartAlert = true
                     }
                 }
+            } header: {
+                Text(LocalizedStringKey("Sprache / Language"))
+                    .font(.headline)
+                    .fontWeight(.bold)
+                    .padding(.bottom, 5)
             }
             
-            Section(LocalizedStringKey("PDF Komprimierung")) {
+            Section {
                 VStack(alignment: .leading) {
                     HStack {
                         Text(LocalizedStringKey("Qualität: \(Int(compressionQuality * 100))%"))
@@ -53,10 +43,15 @@ struct SettingsView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
+            } header: {
+                Text(LocalizedStringKey("PDF Komprimierung"))
+                    .font(.headline)
+                    .fontWeight(.bold)
+                    .padding(.bottom, 5)
             }
         }
         .padding()
-        .frame(width: 300, height: 200)
+        .frame(width: 400, height: 250)
         .onAppear {
             selectedLanguage = Language(rawValue: appLanguage) ?? .german
         }

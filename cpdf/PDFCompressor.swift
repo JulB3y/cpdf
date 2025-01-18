@@ -92,16 +92,16 @@ class PDFCompressor: ObservableObject {
             // Hole die Qualitätseinstellung aus UserDefaults
             let compressionQuality = UserDefaults.standard.double(forKey: "compressionQuality")
             
-            // Berechne die Auflösung basierend auf der Qualitätseinstellung
-            let resolutionScale = 1.0 + (compressionQuality * 1.0) // Skala von 1.0 bis 2.0
-            
             // Komprimiere jede Seite einzeln
             for pageIndex in 0..<pdfDocument.pageCount {
-                autoreleasepool {  // Wichtig für Speichermanagement
+                autoreleasepool {
                     guard let page = pdfDocument.page(at: pageIndex) else { return }
                     
                     // Erstelle ein Bild aus der PDF-Seite
                     let pageRect = page.bounds(for: .mediaBox)
+                    
+                    // Berechne die Auflösung basierend auf der Qualitätseinstellung
+                    let resolutionScale = 1.0 + (compressionQuality * 1.0) // Skala von 1.0 bis 2.0
                     
                     // Erstelle einen Bitmap-Kontext mit optimierten Einstellungen
                     guard let bitmapRep = NSBitmapImageRep(
@@ -124,34 +124,32 @@ class PDFCompressor: ObservableObject {
                         graphicsContext.imageInterpolation = .high
                         NSGraphicsContext.current = graphicsContext
                         
-                        let scale: CGFloat = 1.5
-                        graphicsContext.cgContext.scaleBy(x: scale, y: scale)
+                        // Skaliere den Kontext entsprechend der Auflösung
+                        graphicsContext.cgContext.scaleBy(x: resolutionScale, y: resolutionScale)
                         
                         // Weiß als Hintergrund
                         NSColor.white.setFill()
                         NSRect(origin: .zero, size: pageRect.size).fill()
                         
-                        // Optional: Erhöhe den Kontrast für bessere Schwarz-Weiß-Darstellung
-                        graphicsContext.cgContext.setAlpha(1.2)
-                        graphicsContext.cgContext.setShouldSmoothFonts(true)
-                        
+                        // Zeichne die PDF-Seite
                         page.draw(with: .mediaBox, to: graphicsContext.cgContext)
                     }
                     NSGraphicsContext.restoreGraphicsState()
                     
-                    // Verwende die Qualitätseinstellung auch für JPEG-Komprimierung
-                    guard let compressedData = bitmapRep.representation(
+                    // Erstelle eine neue PDF-Seite aus dem komprimierten Bild
+                    if let compressedData = bitmapRep.representation(
                         using: .jpeg,
                         properties: [
                             .compressionFactor: compressionQuality,
                             .progressive: true
                         ]
-                    ) else { return }
-                    
-                    // Erstelle eine neue PDF-Seite aus dem komprimierten Bild
-                    if let compressedImage = NSImage(data: compressedData) {
-                        compressedImage.size = pageRect.size // Behalte die originale Größe
+                    ),
+                    let compressedImage = NSImage(data: compressedData) {
+                        // Wichtig: Setze die Größe auf die originale Seitengröße
+                        compressedImage.size = pageRect.size
                         if let newPage = PDFPage(image: compressedImage) {
+                            // Setze die MediaBox auf die originale Größe
+                            newPage.setBounds(pageRect, for: .mediaBox)
                             outputPDFDocument.insert(newPage, at: pageIndex)
                         }
                     }

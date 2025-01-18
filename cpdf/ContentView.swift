@@ -62,7 +62,6 @@ struct ContentView: View {
     private func selectPDF() {
         let dialog = NSOpenPanel()
         dialog.title = "Bitte wählen Sie den Ordner aus, um Schreibzugriff zu gewähren"
-        dialog.showsResizeIndicator = true
         dialog.showsHiddenFiles = false
         dialog.allowsMultipleSelection = false
         dialog.canChooseDirectories = false
