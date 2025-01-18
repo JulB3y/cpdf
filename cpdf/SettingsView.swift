@@ -1,11 +1,27 @@
 import SwiftUI
 import Foundation
 
+enum ColorMode: String, CaseIterable, Identifiable {
+    case fullColor = "full"
+    case grayscale = "gray"
+    
+    var id: String { self.rawValue }
+    
+    var displayName: String {
+        switch self {
+        case .fullColor: return String(localized: "Voller Farbraum")
+        case .grayscale: return String(localized: "Graustufen")
+        }
+    }
+}
+
 struct SettingsView: View {
     @AppStorage("compressionQuality") private var compressionQuality = 0.5
     @AppStorage("appLanguage") private var appLanguage = Language.german.rawValue
+    @AppStorage("colorMode") private var colorMode = ColorMode.fullColor.rawValue
     @State private var showingRestartAlert = false
     @State private var selectedLanguage: Language = .german
+    @State private var selectedColorMode: ColorMode = .fullColor
     
     var body: some View {
         Form {
@@ -42,6 +58,15 @@ struct SettingsView: View {
                     Text(LocalizedStringKey("Niedrigere Qualität = kleinere Dateien"))
                         .font(.caption)
                         .foregroundColor(.secondary)
+                    
+                    Picker(LocalizedStringKey("Farbmodus"), selection: $selectedColorMode) {
+                        ForEach(ColorMode.allCases) { mode in
+                            Text(mode.displayName).tag(mode)
+                        }
+                    }
+                    .onChange(of: selectedColorMode) { oldValue, newValue in
+                        colorMode = newValue.rawValue
+                    }
                 }
             } header: {
                 Text(LocalizedStringKey("PDF Komprimierung"))
@@ -51,9 +76,10 @@ struct SettingsView: View {
             }
         }
         .padding()
-        .frame(width: 400, height: 250)
+        .frame(width: 400, height: 300)
         .onAppear {
             selectedLanguage = Language(rawValue: appLanguage) ?? .german
+            selectedColorMode = ColorMode(rawValue: colorMode) ?? .fullColor
         }
         .alert(LocalizedStringKey("Neustart erforderlich"), isPresented: $showingRestartAlert) {
             Button(LocalizedStringKey("Später")) { }
