@@ -1,100 +1,170 @@
 import SwiftUI
 import Foundation
 
-enum ColorMode: String, CaseIterable, Identifiable {
-    case fullColor = "full"
-    case grayscale = "gray"
+struct SettingsView: View {
+    let onDismiss: () -> Void
+    @AppStorage("appLanguage") private var appLanguage = Language.german.rawValue
+    @AppStorage("colorMode") private var colorMode = ColorMode.fullColor.rawValue
+    @AppStorage("compressionQuality") private var compressionQuality = CompressionQuality.medium.rawValue
+    @State private var showingRestartAlert = false
+    @State private var selectedLanguage: Language = .german
+    @State private var selectedColorMode: ColorMode = .fullColor
+    @State private var selectedQuality: CompressionQuality = .medium
+    @State private var selectedTab = "General"
     
-    var id: String { self.rawValue }
-    
-    var displayName: String {
-        switch self {
-        case .fullColor: return String(localized: "Voller Farbraum")
-        case .grayscale: return String(localized: "Graustufen")
+    var body: some View {
+        VStack(spacing: 0) {
+            // Titelleiste
+            Text("Settings")
+                .font(.system(size: 13, weight: .bold))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 6)
+                .background(Color(NSColor.windowBackgroundColor))
+            
+            // Tabs
+            HStack(spacing: 0) {
+                TabButton(title: "General", icon: "gearshape.fill", isSelected: selectedTab == "General") {
+                    selectedTab = "General"
+                }
+                
+                TabButton(title: "Info", icon: "info.circle.fill", isSelected: selectedTab == "Info") {
+                    selectedTab = "Info"
+                }
+            }
+            .padding(.horizontal, 2)
+            .padding(.vertical, 2)
+            
+            Divider()
+            
+            // Content
+            if selectedTab == "General" {
+                ScrollView {
+                    VStack(spacing: 20) {
+                        // Sprache
+                        GroupBox {
+                            Picker(LocalizedStringKey("Sprache"), selection: $selectedLanguage) {
+                                ForEach(Language.allCases) { language in
+                                    Text(language.displayName).tag(language)
+                                }
+                            }
+                            .onChange(of: selectedLanguage) { oldValue, newValue in
+                                if appLanguage != newValue.rawValue {
+                                    appLanguage = newValue.rawValue
+                                    showingRestartAlert = true
+                                }
+                            }
+                        } label: {
+                            Text(LocalizedStringKey("Sprache / Language"))
+                                .font(.headline)
+                        }
+                        .background(Color(NSColor.windowBackgroundColor))
+                        
+                        // PDF Komprimierung
+                        GroupBox {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Picker(LocalizedStringKey("Kompressionsgrad"), selection: $selectedQuality) {
+                                    ForEach(CompressionQuality.allCases) { quality in
+                                        Text(quality.displayName).tag(quality)
+                                    }
+                                }
+                                
+                                Text(LocalizedStringKey("Niedrigere Auflösung = kleinere Dateien"))
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                
+                                Picker(LocalizedStringKey("Farbmodus"), selection: $selectedColorMode) {
+                                    ForEach(ColorMode.allCases) { mode in
+                                        Text(mode.displayName).tag(mode)
+                                    }
+                                }
+                            }
+                        } label: {
+                            Text(LocalizedStringKey("PDF Komprimierung"))
+                                .font(.headline)
+                        }
+                        .background(Color(NSColor.windowBackgroundColor))
+                    }
+                    .padding()
+                }
+                .background(Color(NSColor.windowBackgroundColor))
+            } else {
+                // Info Tab
+                ScrollView {
+                    VStack(spacing: 20) {
+                        GroupBox {
+                            VStack(alignment: .leading, spacing: 8) {
+                                InfoRow(label: "Version", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")
+                                InfoRow(label: "Build", value: Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1")
+                            }
+                        } label: {
+                            Text("App Information")
+                                .font(.headline)
+                        }
+                    }
+                    .padding()
+                }
+                .background(Color(NSColor.windowBackgroundColor))
+            }
+        }
+        .overlay(
+            Button(LocalizedStringKey("Done")) {
+                onDismiss()
+            }
+            .keyboardShortcut(.escape, modifiers: [])
+            .buttonStyle(.borderedProminent)
+            .padding(16),
+            alignment: .bottomTrailing
+        )
+        .frame(width: 500, height: 400)
+        .background(Color(NSColor.windowBackgroundColor))
+        .onChange(of: selectedColorMode) { oldValue, newValue in
+            colorMode = newValue.rawValue
+        }
+        .onChange(of: selectedQuality) { oldValue, newValue in
+            compressionQuality = newValue.rawValue
         }
     }
 }
 
-struct SettingsView: View {
-    @AppStorage("compressionQuality") private var compressionQuality = 0.5
-    @AppStorage("appLanguage") private var appLanguage = Language.german.rawValue
-    @AppStorage("colorMode") private var colorMode = ColorMode.fullColor.rawValue
-    @State private var showingRestartAlert = false
-    @State private var selectedLanguage: Language = .german
-    @State private var selectedColorMode: ColorMode = .fullColor
+// Verbesserte TabButton-Struktur
+struct TabButton: View {
+    let title: String
+    let icon: String
+    let isSelected: Bool
+    let action: () -> Void
     
     var body: some View {
-        Form {
-            Section {
-                Picker(LocalizedStringKey("Sprache"), selection: $selectedLanguage) {
-                    ForEach(Language.allCases) { language in
-                        Text(language.displayName).tag(language)
-                    }
-                }
-                .onChange(of: selectedLanguage) { oldValue, newValue in
-                    if appLanguage != newValue.rawValue {
-                        appLanguage = newValue.rawValue
-                        showingRestartAlert = true
-                    }
-                }
-            } header: {
-                Text(LocalizedStringKey("Sprache / Language"))
-                    .font(.headline)
-                    .fontWeight(.bold)
-                    .padding(.bottom, 5)
+        Button(action: action) {
+            VStack(spacing: 4) {  // Vertikales Layout
+                Image(systemName: icon)
+                    .symbolRenderingMode(.hierarchical)
+                    .foregroundStyle(isSelected ? Color.accentColor : .secondary)
+                    .font(.system(size: 20))  // Größeres Icon
+                Text(title)
+                    .font(.caption)  // Kleinerer Text
+                    .foregroundColor(isSelected ? .primary : .secondary)
             }
-            
-            Section {
-                VStack(alignment: .leading) {
-                    HStack {
-                        Text(LocalizedStringKey("Qualität: \(Int(compressionQuality * 100))%"))
-                        Spacer()
-                    }
-                    
-                    Slider(value: $compressionQuality, in: 0.1...1.0) { 
-                        Text(LocalizedStringKey("Qualität"))
-                    }
-                    
-                    Text(LocalizedStringKey("Niedrigere Qualität = kleinere Dateien"))
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                    Picker(LocalizedStringKey("Farbmodus"), selection: $selectedColorMode) {
-                        ForEach(ColorMode.allCases) { mode in
-                            Text(mode.displayName).tag(mode)
-                        }
-                    }
-                    .onChange(of: selectedColorMode) { oldValue, newValue in
-                        colorMode = newValue.rawValue
-                    }
-                }
-            } header: {
-                Text(LocalizedStringKey("PDF Komprimierung"))
-                    .font(.headline)
-                    .fontWeight(.bold)
-                    .padding(.bottom, 5)
-            }
+            .frame(width: 70, height: 50)  // Feste Größe für konsistentes Layout
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isSelected ? Color.accentColor.opacity(0.1) : Color.clear)
+            )
+            .contentShape(RoundedRectangle(cornerRadius: 8))
         }
-        .padding()
-        .frame(width: 400, height: 300)
-        .onAppear {
-            selectedLanguage = Language(rawValue: appLanguage) ?? .german
-            selectedColorMode = ColorMode(rawValue: colorMode) ?? .fullColor
-        }
-        .alert(LocalizedStringKey("Neustart erforderlich"), isPresented: $showingRestartAlert) {
-            Button(LocalizedStringKey("Später")) { }
-            Button(LocalizedStringKey("Jetzt neustarten")) {
-                restartApp()
-            }
-        } message: {
-            Text(LocalizedStringKey("Bitte starten Sie die App neu, damit die Sprachänderungen wirksam werden."))
-        }
+        .buttonStyle(.plain)
     }
+}
+
+struct InfoRow: View {
+    let label: String
+    let value: String
     
-    private func restartApp() {
-        let url = Bundle.main.bundleURL
-        let path = "/usr/bin/open"
-        Process.launchedProcess(launchPath: path, arguments: [url.path])
-        NSApp.terminate(nil)
+    var body: some View {
+        HStack {
+            Text(label)
+                .foregroundColor(.secondary)
+            Spacer()
+            Text(value)
+        }
     }
 } 

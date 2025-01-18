@@ -4,6 +4,9 @@ import QuickLook
 
 struct CompressedPDFView: View {
     @EnvironmentObject private var pdfCompressor: PDFCompressor
+    @EnvironmentObject private var appDelegate: AppDelegate
+    @Environment(\.openWindow) private var openWindow
+    
     let originalSize: Int64
     let compressedSize: Int64
     let originalName: String
@@ -12,9 +15,22 @@ struct CompressedPDFView: View {
     
     var body: some View {
         VStack(spacing: 30) {
-            Text(LocalizedStringKey("PDF Komprimierung"))
-                .font(.title)
-                .foregroundColor(.primary)
+            HStack {
+                Text(LocalizedStringKey("PDF Komprimierung"))
+                    .font(.title)
+                    .foregroundColor(.primary)
+                
+                Spacer()
+                
+                // Einstellungen-Button
+                Button {
+                    appDelegate.openSettings()
+                } label: {
+                    Image(systemName: "gearshape")
+                        .font(.title2)
+                }
+                .buttonStyle(.plain)
+            }
             
             HStack(spacing: 40) {
                 // Original PDF

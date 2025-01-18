@@ -1,67 +1,48 @@
 import AppKit
 import SwiftUI
 
-class AppDelegate: NSObject, NSApplicationDelegate {
-    private var statusItem: NSStatusItem!
-    private var settingsWindow: NSWindow?
+class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
+    @Published var settingsWindow: NSWindow?
+    @Published var isSettingsPresented = false
     
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // Erstelle das Menü-Item in der Menüleiste
-        let appMenu = NSMenu()
-        let appName = ProcessInfo.processInfo.processName
-        
-        // App Menü
-        let mainMenuItem = NSMenuItem()
-        mainMenuItem.submenu = NSMenu(title: appName)
-        
-        // Einstellungen
-        let settingsItem = NSMenuItem(
-            title: String(localized: "Einstellungen"),
-            action: #selector(openSettings),
-            keyEquivalent: ","
-        )
-        settingsItem.target = self
-        mainMenuItem.submenu?.addItem(settingsItem)
-        
-        // Separator
-        mainMenuItem.submenu?.addItem(.separator())
-        
-        // Beenden
-        let quitItem = NSMenuItem(
-            title: String(localized: "Beenden"),
-            action: #selector(NSApplication.terminate(_:)),
-            keyEquivalent: "q"
-        )
-        mainMenuItem.submenu?.addItem(quitItem)
-        
-        // Füge das Menü zur Menüleiste hinzu
-        appMenu.addItem(mainMenuItem)
-        NSApp.mainMenu = appMenu
+        // Entferne die Menü-Konfiguration hier, da sie jetzt in cpdfApp.swift ist
     }
     
-    @objc private func openSettings() {
-        if settingsWindow == nil {
-            let settingsView = SettingsView()
-            settingsWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 400, height: 250),
-                styleMask: [.titled, .closable],
-                backing: .buffered,
-                defer: false
-            )
-            settingsWindow?.title = String(localized: "Einstellungen")
-            settingsWindow?.center()
-            settingsWindow?.contentView = NSHostingView(rootView: settingsView)
-            settingsWindow?.isReleasedWhenClosed = false
+    @objc func openSettings() {
+        if isSettingsPresented {
+            settingsWindow?.makeKeyAndOrderFront(nil)
+            return
         }
         
-        settingsWindow?.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
-    }
-    
-    func applicationWillTerminate(_ notification: Notification) {
-        // Cleanup beim Beenden
-        if let statusItem = NSApp.windowsMenu?.items.first as? NSStatusItem {
-            NSStatusBar.system.removeStatusItem(statusItem)
+        let settingsView = SettingsView(onDismiss: { [weak self] in
+            self?.isSettingsPresented = false
+            self?.settingsWindow?.close()
+        })
+        
+        let hostingController = NSHostingController(rootView: settingsView)
+        
+        settingsWindow = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 500, height: 400),
+            styleMask: [.titled, .closable],
+            backing: .buffered,
+            defer: false
+        )
+        
+        settingsWindow?.title = String(localized: "Einstellungen")
+        settingsWindow?.backgroundColor = .windowBackgroundColor
+        settingsWindow?.center()
+        settingsWindow?.contentViewController = hostingController
+        settingsWindow?.isReleasedWhenClosed = false
+        
+        // Zeige das Fenster als Sheet
+        if let mainWindow = NSApplication.shared.mainWindow {
+            mainWindow.beginSheet(settingsWindow!) { _ in
+                self.isSettingsPresented = false
+            }
         }
+        
+        isSettingsPresented = true
+        NSApplication.shared.activate(ignoringOtherApps: true)
     }
 } 

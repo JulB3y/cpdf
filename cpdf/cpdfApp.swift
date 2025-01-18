@@ -41,6 +41,20 @@ struct cpdfApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(pdfCompressor)
+                .environmentObject(appDelegate)
+        }
+        .commands {
+            // Ersetze das Standard-App-Menü
+            CommandGroup(replacing: .appSettings) {
+                Button("Einstellungen...") {
+                    appDelegate.openSettings()
+                }
+                .keyboardShortcut(",", modifiers: .command)
+            }
+            
+            // Entferne die anderen Standard-Menüs
+            CommandGroup(replacing: .windowList) { }
+            CommandGroup(replacing: .help) { }
         }
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)

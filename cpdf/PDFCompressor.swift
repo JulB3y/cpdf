@@ -89,7 +89,7 @@ class PDFCompressor: ObservableObject {
             ]
             
             // Hole die Einstellungen
-            let compressionQuality = UserDefaults.standard.double(forKey: "compressionQuality")
+            let qualityMode = CompressionQuality(rawValue: UserDefaults.standard.string(forKey: "compressionQuality") ?? "medium") ?? .medium
             let colorMode = ColorMode(rawValue: UserDefaults.standard.string(forKey: "colorMode") ?? "full") ?? .fullColor
             
             for pageIndex in 0..<pdfDocument.pageCount {
@@ -97,15 +97,36 @@ class PDFCompressor: ObservableObject {
                     guard let page = pdfDocument.page(at: pageIndex) else { return }
                     
                     let pageRect = page.bounds(for: .mediaBox)
-                    let resolutionScale = 1.0 + (compressionQuality * 1.0)
+                    let targetResolution = qualityMode.resolution
+                    
+                    // Bestimme die kürzere Seite und berechne die Skalierung
+                    let shortestSide = min(pageRect.width, pageRect.height)
+                    let longestSide = max(pageRect.width, pageRect.height)
+                    
+                    // Berechne die finalen Dimensionen
+                    var finalWidth: CGFloat
+                    var finalHeight: CGFloat
+                    var scale: CGFloat
+                    
+                    if pageRect.width < pageRect.height {
+                        // Breite ist die kürzere Seite
+                        finalWidth = CGFloat(targetResolution)
+                        scale = finalWidth / pageRect.width
+                        finalHeight = pageRect.height * scale
+                    } else {
+                        // Höhe ist die kürzere Seite
+                        finalHeight = CGFloat(targetResolution)
+                        scale = finalHeight / pageRect.height
+                        finalWidth = pageRect.width * scale
+                    }
                     
                     // Bitmap-Kontext basierend auf ColorMode
                     guard let bitmapRep = NSBitmapImageRep(
                         bitmapDataPlanes: nil,
-                        pixelsWide: Int(pageRect.width * resolutionScale),
-                        pixelsHigh: Int(pageRect.height * resolutionScale),
+                        pixelsWide: Int(finalWidth),
+                        pixelsHigh: Int(finalHeight),
                         bitsPerSample: 8,
-                        samplesPerPixel: colorMode == .fullColor ? 4 : 1, // 4 für RGBA, 1 für Graustufen
+                        samplesPerPixel: colorMode == .fullColor ? 4 : 1,
                         hasAlpha: colorMode == .fullColor,
                         isPlanar: false,
                         colorSpaceName: colorMode == .fullColor ? .deviceRGB : .calibratedWhite,
@@ -120,7 +141,7 @@ class PDFCompressor: ObservableObject {
                         graphicsContext.imageInterpolation = .high
                         NSGraphicsContext.current = graphicsContext
                         
-                        graphicsContext.cgContext.scaleBy(x: resolutionScale, y: resolutionScale)
+                        graphicsContext.cgContext.scaleBy(x: scale, y: scale)
                         
                         // Weißer Hintergrund
                         NSColor.white.setFill()
@@ -135,7 +156,7 @@ class PDFCompressor: ObservableObject {
                     if let compressedData = bitmapRep.representation(
                         using: .jpeg,
                         properties: [
-                            .compressionFactor: compressionQuality,
+                            .compressionFactor: qualityMode.compressionFactor,
                             .progressive: true
                         ]
                     ),

@@ -24,3 +24,9 @@
 "Farbmodus" = "Farbmodus";
 "Voller Farbraum" = "Voller Farbraum";
 "Graustufen" = "Graustufen";
+"Kompressionsgrad" = "Kompressionsgrad";
+"Schwach (1080p)" = "Schwach (1080p)";
+"Mittel (720p)" = "Mittel (720p)";
+"Stark (480p)" = "Stark (480p)";
+"Niedrigere Auflösung = kleinere Dateien" = "Niedrigere Auflösung = kleinere Dateien";
+"Done" = "Fertig";
