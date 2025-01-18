@@ -27,6 +27,7 @@
 		579F8BAC2D398C7000A5F52B /* cpdf.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = cpdf.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		579F8BBD2D398C7100A5F52B /* cpdfTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = cpdfTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		579F8BC72D398C7100A5F52B /* cpdfUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = cpdfUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		579F8BEF2D398C9200A5F52B /* cpdf.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = cpdf.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -89,6 +90,11 @@
 				579F8BBD2D398C7100A5F52B /* cpdfTests.xctest */,
 				579F8BC72D398C7100A5F52B /* cpdfUITests.xctest */,
 			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		579F8BF02D398C9200A5F52B /* Products */ = {
+			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
 		};
@@ -198,6 +204,12 @@
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 579F8BAD2D398C7000A5F52B /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 579F8BF02D398C9200A5F52B /* Products */;
+					ProjectRef = 579F8BEF2D398C9200A5F52B /* cpdf.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				579F8BAB2D398C7000A5F52B /* cpdf */,

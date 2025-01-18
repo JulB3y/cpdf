@@ -1,13 +1,13 @@
 //
-//  cpdfUITestsLaunchTests.swift
-//  cpdfUITests
+//  converterUITestsLaunchTests.swift
+//  converterUITests
 //
-//  Created by Julius Beyer on 16.01.25.
+//  Created by Julius Beyer on 14.01.25.
 //
 
 import XCTest
 
-final class cpdfUITestsLaunchTests: XCTestCase {
+final class converterUITestsLaunchTests: XCTestCase {
 
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true

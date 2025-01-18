@@ -1,13 +1,13 @@
 //
-//  cpdfUITests.swift
-//  cpdfUITests
+//  converterUITests.swift
+//  converterUITests
 //
-//  Created by Julius Beyer on 16.01.25.
+//  Created by Julius Beyer on 14.01.25.
 //
 
 import XCTest
 
-final class cpdfUITests: XCTestCase {
+final class converterUITests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
