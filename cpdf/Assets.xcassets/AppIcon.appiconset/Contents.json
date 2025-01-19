@@ -1,67 +1,67 @@
 {
   "images" : [
     {
-      "filename" : "slice1.png",
+      "filename" : "cpdf_icon 1.png",
       "idiom" : "ios-marketing",
       "scale" : "1x",
       "size" : "1024x1024"
     },
     {
-      "filename" : "slice1_7.png",
+      "filename" : "cpdf_icon_7.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "16x16"
     },
     {
-      "filename" : "slice1_6 1.png",
+      "filename" : "cpdf_icon_6 1.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "16x16"
     },
     {
-      "filename" : "slice1_6.png",
+      "filename" : "cpdf_icon_6.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "32x32"
     },
     {
-      "filename" : "slice1_5.png",
+      "filename" : "cpdf_icon_5.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "32x32"
     },
     {
-      "filename" : "slice1_4 1.png",
+      "filename" : "cpdf_icon_4.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "128x128"
     },
     {
-      "filename" : "slice1_3 1.png",
+      "filename" : "cpdf_icon_3 1.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "128x128"
     },
     {
-      "filename" : "slice1_3.png",
+      "filename" : "cpdf_icon_3.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "256x256"
     },
     {
-      "filename" : "slice1_2.png",
+      "filename" : "cpdf_icon_2 1.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "256x256"
     },
     {
-      "filename" : "slice1_2 1.png",
+      "filename" : "cpdf_icon_2.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "512x512"
     },
     {
-      "filename" : "slice1 1.png",
+      "filename" : "cpdf_icon.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "512x512"
