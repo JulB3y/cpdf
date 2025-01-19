@@ -2,55 +2,59 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>NSDocumentsFolderUsageDescription</key>
-    <string>Die App benötigt Zugriff auf Ihre PDFs, um diese zu komprimieren.</string>
-    <key>NSDownloadsFolderUsageDescription</key>
-    <string>Die App benötigt Zugriff auf Ihre PDFs, um diese zu komprimieren.</string>
-    <key>NSDesktopFolderUsageDescription</key>
-    <string>Die App benötigt Zugriff auf Ihre PDFs, um diese zu komprimieren.</string>
-    <key>NSICloudDriveUsageDescription</key>
-    <string>Die App benötigt Zugriff auf Ihre iCloud Drive PDFs, um diese zu komprimieren.</string>
-    <key>NSUbiquitousContainers</key>
-    <dict>
-        <key>iCloud.com.yourcompany.cpdf</key>
-        <dict>
-            <key>NSUbiquitousContainerIsDocumentScopePublic</key>
-            <true/>
-            <key>NSUbiquitousContainerName</key>
-            <string>cpdf</string>
-            <key>NSUbiquitousContainerSupportedFolderLevels</key>
-            <string>Any</string>
-        </dict>
-    </dict>
-    <key>CFBundleDocumentTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleTypeName</key>
-            <string>PDF Document</string>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-            <key>LSHandlerRank</key>
-            <string>Default</string>
-            <key>LSItemContentTypes</key>
-            <array>
-                <string>com.adobe.pdf</string>
-            </array>
-        </dict>
-    </array>
-    <key>CFBundleIconFile</key>
-    <string>cpdf.icns</string>
-    <key>CFBundleIdentifier</key>
-    <string>com.yourcompany.cpdf</string>
-    <key>CFBundleName</key>
-    <string>cpdf</string>
-    <key>CFBundleDisplayName</key>
-    <string>cpdf</string>
-    <key>CFBundleDevelopmentRegion</key>
-    <string>en</string>
-    <key>CFBundleLocalizations</key>
-    <array>
-        <string>en</string>
-        <string>de</string>
-    </array>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>Die App benötigt Zugriff auf Ihre PDFs, um diese zu komprimieren.</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>Die App benötigt Zugriff auf Ihre PDFs, um diese zu komprimieren.</string>
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>Die App benötigt Zugriff auf Ihre PDFs, um diese zu komprimieren.</string>
+	<key>NSICloudDriveUsageDescription</key>
+	<string>Die App benötigt Zugriff auf Ihre iCloud Drive PDFs, um diese zu komprimieren.</string>
+	<key>NSUbiquitousContainers</key>
+	<dict>
+		<key>iCloud.com.yourcompany.cpdf</key>
+		<dict>
+			<key>NSUbiquitousContainerIsDocumentScopePublic</key>
+			<true/>
+			<key>NSUbiquitousContainerName</key>
+			<string>cpdf</string>
+			<key>NSUbiquitousContainerSupportedFolderLevels</key>
+			<string>Any</string>
+		</dict>
+	</dict>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>PDF Document</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.adobe.pdf</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleIconFile</key>
+	<string>cpdf.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.yourcompany.cpdf</string>
+	<key>CFBundleName</key>
+	<string>cpdf</string>
+	<key>CFBundleDisplayName</key>
+	<string>cpdf</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>de</string>
+	</array>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
 </dict>
-</plist> 
+</plist>

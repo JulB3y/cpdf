@@ -6,7 +6,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     @Published var isSettingsPresented = false
     
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // Entferne die Menü-Konfiguration hier, da sie jetzt in cpdfApp.swift ist
+        // Konfiguriere das About-Panel
+        if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String,
+           let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
+            let aboutInfo: [NSApplication.AboutPanelOptionKey: Any] = [
+                .version: version,
+                .applicationVersion: build,
+                .credits: "© 2024 JulB3y"
+            ]
+            NSApplication.shared.orderFrontStandardAboutPanel(options: aboutInfo)
+            NSApplication.shared.activate(ignoringOtherApps: true)
+        }
     }
     
     @objc func openSettings() {

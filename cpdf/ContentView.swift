@@ -2,7 +2,7 @@
 //  ContentView.swift
 //  cpdf
 //
-//  Created by Julius Beyer on 14.01.25.
+//  Created by JulB3y on 14.01.25.
 //
 
 import SwiftUI

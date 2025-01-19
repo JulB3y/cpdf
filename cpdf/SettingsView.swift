@@ -7,10 +7,22 @@ struct SettingsView: View {
     @AppStorage("colorMode") private var colorMode = ColorMode.fullColor.rawValue
     @AppStorage("compressionQuality") private var compressionQuality = CompressionQuality.medium.rawValue
     @State private var showingRestartAlert = false
-    @State private var selectedLanguage: Language = .german
-    @State private var selectedColorMode: ColorMode = .fullColor
-    @State private var selectedQuality: CompressionQuality = .medium
+    @State private var selectedLanguage: Language
+    @State private var selectedColorMode: ColorMode
+    @State private var selectedQuality: CompressionQuality
     @State private var selectedTab = "General"
+    
+    init(onDismiss: @escaping () -> Void) {
+        self.onDismiss = onDismiss
+        // Initialisiere alle Einstellungen mit den gespeicherten Werten
+        let currentLanguage = UserDefaults.standard.string(forKey: "appLanguage") ?? Language.german.rawValue
+        let currentColorMode = UserDefaults.standard.string(forKey: "colorMode") ?? ColorMode.fullColor.rawValue
+        let currentQuality = UserDefaults.standard.string(forKey: "compressionQuality") ?? CompressionQuality.medium.rawValue
+        
+        _selectedLanguage = State(initialValue: Language(rawValue: currentLanguage) ?? .german)
+        _selectedColorMode = State(initialValue: ColorMode(rawValue: currentColorMode) ?? .fullColor)
+        _selectedQuality = State(initialValue: CompressionQuality(rawValue: currentQuality) ?? .medium)
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -118,10 +130,36 @@ struct SettingsView: View {
         .frame(width: 500, height: 400)
         .background(Color(NSColor.windowBackgroundColor))
         .onChange(of: selectedColorMode) { oldValue, newValue in
-            colorMode = newValue.rawValue
+            if colorMode != newValue.rawValue {
+                colorMode = newValue.rawValue
+            }
         }
         .onChange(of: selectedQuality) { oldValue, newValue in
-            compressionQuality = newValue.rawValue
+            if compressionQuality != newValue.rawValue {
+                compressionQuality = newValue.rawValue
+            }
+        }
+        .alert("Neustart erforderlich", isPresented: $showingRestartAlert) {
+            Button("Später") {
+                // Der Benutzer möchte später neustarten
+            }
+            Button("Jetzt neustarten") {
+                // Erst Settings schließen
+                onDismiss()
+                
+                // Kurze Verzögerung für sauberes Schließen
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    // Starte die App neu
+                    let url = Bundle.main.bundleURL
+                    let configuration = NSWorkspace.OpenConfiguration()
+                    NSWorkspace.shared.openApplication(at: url,
+                                                     configuration: configuration) { _, _ in
+                        NSApplication.shared.terminate(nil)
+                    }
+                }
+            }
+        } message: {
+            Text(LocalizedStringKey("Bitte starten Sie die App neu, damit die Sprachänderungen wirksam werden."))
         }
     }
 }
