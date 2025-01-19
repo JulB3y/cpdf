@@ -1,7 +1,7 @@
 # cpdf - PDF Compression for macOS
 
 <p align="center">
-  <img src="Assets/AppIcon.png" width="128" height="128">
+  <img src="cpdf/Assets.xcassets/Appicon.appiconset/cpdf_icon_2.png" width="128" height="128">
 </p>
 
 A lightweight, native macOS application for efficient PDF compression. Built with SwiftUI, cpdf offers an intuitive interface for reducing PDF file sizes while maintaining reasonable quality.
