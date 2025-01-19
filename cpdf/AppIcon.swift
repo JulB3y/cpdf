@@ -1,4 +1,4 @@
-import SwiftUI
+ import SwiftUI
 
 struct AppIcon: View {
     var body: some View {
