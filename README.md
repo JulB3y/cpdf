@@ -22,8 +22,15 @@ A lightweight, native macOS application for efficient PDF compression. Built wit
 
 ## Screenshots
 
-[Screenshots would go here]
-
+<p align="center">
+  <img src="screenshots/mainview.png" width="720">
+</p>
+<p align="center">
+  <img src="screenshots/settingsview.png" width="720">
+</p>
+<p align="center">
+  <img src="screenshots/compressedview.png" width="720">
+</p>
 ## Installation
 
 1. Download the latest version from the [Releases](https://github.com/JulB3y/cpdf/releases) page
@@ -69,3 +76,7 @@ Built with modern Apple technologies and best practices.
 1. Clone the repository
 2. Open the project in Xcode
 3. Build and run the project
+
+
+## Credits
+- [CompressPDF](https://github.com/OpenToolKit/CompressPDF)
