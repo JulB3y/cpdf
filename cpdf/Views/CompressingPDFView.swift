@@ -5,8 +5,10 @@ struct CompressingPDFView: View {
     @EnvironmentObject private var pdfCompressor: PDFCompressor
     let fileName: String
     @State private var thumbnail: NSImage?
-    @State private var progress: Double = 0
-    @State private var compressionFinished = false
+    @State private var dotCount = 0
+    
+    // Timer für die Punkteanimation
+    let timer = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
     
     var body: some View {
         VStack(spacing: 20) {
@@ -40,19 +42,13 @@ struct CompressingPDFView: View {
             
             // Komprimierungsstatus
             VStack(spacing: 12) {
-                Text(LocalizedStringKey("PDF wird komprimiert"))
+                Text("Komprimiere\(String(repeating: ".", count: dotCount))")
                     .font(.headline)
+                    .onReceive(timer) { _ in
+                        dotCount = (dotCount + 1) % 4
+                    }
                 
                 Text(fileName)
-                    .foregroundColor(.secondary)
-                
-                // Fortschrittsbalken mit animiertem Progress
-                ProgressView(value: progress, total: 1.0)
-                    .progressViewStyle(.linear)
-                    .frame(width: 200)
-                
-                Text("\(Int(progress * 100))%")
-                    .font(.caption)
                     .foregroundColor(.secondary)
             }
         }
@@ -60,28 +56,19 @@ struct CompressingPDFView: View {
             loadThumbnail()
             startCompression()
         }
+        .onDisappear {
+            // Stoppe den Timer beim Verlassen der View
+            timer.upstream.connect().cancel()
+        }
     }
     
     private func startCompression() {
-        Task { @MainActor in
+        Task(priority: .userInitiated) {
             do {
-                // Starte die Animation
-                withAnimation(.easeIn(duration: 0.3)) {
-                    progress = 0.3
-                }
-                
-                // Führe die Komprimierung durch
+                // Führe die Komprimierung im Hintergrund durch
                 try await pdfCompressor.finishCompression()
-                
-                // Wenn wir hier ankommen, war die Komprimierung erfolgreich
-                // Zeige schnell den Rest des Fortschritts an
-                withAnimation(.easeOut(duration: 0.2)) {
-                    progress = 1.0
-                }
-                
             } catch {
                 print("❌ Fehler bei der Komprimierung: \(error)")
-                // Stelle sicher, dass der Status korrekt gesetzt wird
                 await MainActor.run {
                     pdfCompressor.isCompressing = false
                     if error.localizedDescription.contains("Keine Größenreduzierung möglich") {
@@ -95,64 +82,60 @@ struct CompressingPDFView: View {
     private func loadThumbnail() {
         guard let url = pdfCompressor.lastOriginalURL else { return }
         
-        Task { @MainActor in
-            // Lade das Dokument
+        Task(priority: .userInitiated) {
             guard let document = PDFDocument(url: url),
                   let pdfPage = document.page(at: 0) else { return }
             
-            // Erstelle das Thumbnail direkt auf dem MainActor
-            self.thumbnail = await createThumbnail(from: pdfPage)
+            let thumbnail = await createThumbnail(from: pdfPage)
+            await MainActor.run {
+                self.thumbnail = thumbnail
+            }
         }
     }
     
-    @MainActor
     private func createThumbnail(from pdfPage: PDFPage) async -> NSImage? {
-        let pageRect = pdfPage.bounds(for: .mediaBox)
-        
-        // Berechne das Seitenverhältnis und die Thumbnail-Größe
-        let aspectRatio = pageRect.width / pageRect.height
-        let maxHeight: CGFloat = 280
-        let maxWidth: CGFloat = 200
-        
-        let thumbnailSize: NSSize
-        if aspectRatio > 1 {
-            thumbnailSize = NSSize(width: maxWidth, height: maxWidth / aspectRatio)
-        } else {
-            thumbnailSize = NSSize(width: maxHeight * aspectRatio, height: maxHeight)
-        }
-        
-        // Erstelle das Thumbnail direkt auf dem MainActor
-        return autoreleasepool { () -> NSImage? in
-            let thumbnail = NSImage(size: thumbnailSize)
+        await MainActor.run {
+            let pageRect = pdfPage.bounds(for: .mediaBox)
             
-            thumbnail.lockFocus()
-            defer { thumbnail.unlockFocus() }
+            let aspectRatio = pageRect.width / pageRect.height
+            let maxHeight: CGFloat = 280
+            let maxWidth: CGFloat = 200
             
-            guard let context = NSGraphicsContext.current else { return nil }
-            
-            // Weißer Hintergrund
-            NSColor.white.setFill()
-            NSBezierPath(rect: NSRect(origin: .zero, size: thumbnailSize)).fill()
-            
-            // Qualitätseinstellungen
-            context.imageInterpolation = .high
-            context.shouldAntialias = true
-            
-            // Sichere PDF-Zeichnung
-            let scale = min(thumbnailSize.width / pageRect.width,
-                          thumbnailSize.height / pageRect.height)
-            
-            context.saveGraphicsState()
-            context.cgContext.scaleBy(x: scale, y: scale)
-            
-            // Verwende drawPage statt draw für bessere Kompatibilität
-            if let page = pdfPage.pageRef {
-                context.cgContext.drawPDFPage(page)
+            let thumbnailSize: NSSize
+            if aspectRatio > 1 {
+                thumbnailSize = NSSize(width: maxWidth, height: maxWidth / aspectRatio)
+            } else {
+                thumbnailSize = NSSize(width: maxHeight * aspectRatio, height: maxHeight)
             }
             
-            context.restoreGraphicsState()
-            
-            return thumbnail
+            return autoreleasepool { () -> NSImage? in
+                let thumbnail = NSImage(size: thumbnailSize)
+                
+                thumbnail.lockFocus()
+                defer { thumbnail.unlockFocus() }
+                
+                guard let context = NSGraphicsContext.current else { return nil }
+                
+                NSColor.white.setFill()
+                NSBezierPath(rect: NSRect(origin: .zero, size: thumbnailSize)).fill()
+                
+                context.imageInterpolation = .high
+                context.shouldAntialias = true
+                
+                let scale = min(thumbnailSize.width / pageRect.width,
+                              thumbnailSize.height / pageRect.height)
+                
+                context.saveGraphicsState()
+                context.cgContext.scaleBy(x: scale, y: scale)
+                
+                if let page = pdfPage.pageRef {
+                    context.cgContext.drawPDFPage(page)
+                }
+                
+                context.restoreGraphicsState()
+                
+                return thumbnail
+            }
         }
     }
 }

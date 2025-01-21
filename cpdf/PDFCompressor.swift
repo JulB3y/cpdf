@@ -157,96 +157,108 @@ class PDFCompressor: ObservableObject {
         let outputPDFDocument = PDFDocument()
         let colorMode = UserDefaults.standard.colorMode
         
+        // Verarbeite jede Seite einzeln und gib der UI Zeit zum Atmen
         for pageIndex in 0..<pdfDocument.pageCount {
-            autoreleasepool {
-                guard let page = pdfDocument.page(at: pageIndex) else { return }
-                
-                let mediaBox = page.bounds(for: .mediaBox)
-                let cropBox = page.bounds(for: .cropBox)
-                let effectiveBox = cropBox.isEmpty ? mediaBox : cropBox
-                
-                // Berechne die Skalierung
-                let scale: CGFloat
-                if quality == .high {
-                    scale = 1.0
-                } else {
-                    let isPortrait = effectiveBox.height > effectiveBox.width
-                    let targetDimension = CGFloat(quality.resolution)
-                    
-                    if isPortrait {
-                        scale = targetDimension / effectiveBox.height
-                    } else {
-                        scale = targetDimension / effectiveBox.width
-                    }
-                }
-                
-                // Füge einen kleinen Rand hinzu für die Sicherheit
-                let padding: CGFloat = 2.0
-                let finalWidth = Int(ceil(effectiveBox.width * scale + 2 * padding))
-                let finalHeight = Int(ceil(effectiveBox.height * scale + 2 * padding))
-                
-                print("DEBUG: Seite \(pageIndex + 1):")
-                print("MediaBox: \(mediaBox)")
-                print("CropBox: \(cropBox)")
-                print("EffectiveBox: \(effectiveBox)")
-                print("Scale: \(scale)")
-                
-                guard let bitmapRep = NSBitmapImageRep(
-                    bitmapDataPlanes: nil,
-                    pixelsWide: finalWidth,
-                    pixelsHigh: finalHeight,
-                    bitsPerSample: 8,
-                    samplesPerPixel: colorMode == .fullColor ? 4 : 1,
-                    hasAlpha: colorMode == .fullColor,
-                    isPlanar: false,
-                    colorSpaceName: colorMode == .fullColor ? .deviceRGB : .calibratedWhite,
-                    bitmapFormat: colorMode == .fullColor ? .alphaFirst : [],
-                    bytesPerRow: 0,
-                    bitsPerPixel: colorMode == .fullColor ? 32 : 8
-                ) else { return }
-                
-                NSGraphicsContext.saveGraphicsState()
-                if let graphicsContext = NSGraphicsContext(bitmapImageRep: bitmapRep) {
-                    graphicsContext.shouldAntialias = true
-                    graphicsContext.imageInterpolation = .high
-                    NSGraphicsContext.current = graphicsContext
-                    
-                    let cgContext = graphicsContext.cgContext
-                    
-                    // Weißer Hintergrund für das gesamte Bitmap
-                    NSColor.white.setFill()
-                    NSRect(x: 0, y: 0, width: finalWidth, height: finalHeight).fill()
-                    
-                    // Korrekte Transformation für PDF-Koordinaten
-                    cgContext.translateBy(x: padding, y: padding)  // Füge Padding hinzu
-                    cgContext.scaleBy(x: scale, y: scale)
-                    
-                    // Verschiebe zum Ursprung der EffectiveBox
-                    cgContext.translateBy(x: -effectiveBox.origin.x, y: -effectiveBox.origin.y)
-                    
-                    // Zeichne die PDF-Seite
-                    page.draw(with: .cropBox, to: cgContext)
-                }
-                NSGraphicsContext.restoreGraphicsState()
-                
-                // Erstelle die neue Seite
-                if let compressedData = bitmapRep.representation(
-                    using: .jpeg,
-                    properties: [
-                        .compressionFactor: quality.compressionFactor,
-                        .progressive: true
-                    ]
-                ),
-                let compressedImage = NSImage(data: compressedData) {
-                    compressedImage.size = effectiveBox.size  // Setze die korrekte Größe
-                    
-                    if let newPage = PDFPage(image: compressedImage) {
-                        // Setze die originalen Bounds
-                        newPage.setBounds(mediaBox, for: .mediaBox)
-                        if !cropBox.isEmpty {
-                            newPage.setBounds(cropBox, for: .cropBox)
+            // Gib dem Hauptthread Zeit zum Aktualisieren
+            if pageIndex % 2 == 0 {  // Nach jeder zweiten Seite
+                try await Task.sleep(nanoseconds: 1_000_000)  // 1ms Pause
+            }
+            
+            try await withCheckedThrowingContinuation { continuation in
+                autoreleasepool {
+                    do {
+                        guard let page = pdfDocument.page(at: pageIndex) else {
+                            continuation.resume()
+                            return
                         }
-                        outputPDFDocument.insert(newPage, at: pageIndex)
+                        
+                        let mediaBox = page.bounds(for: .mediaBox)
+                        let cropBox = page.bounds(for: .cropBox)
+                        let effectiveBox = cropBox.isEmpty ? mediaBox : cropBox
+                        
+                        // Berechne die Skalierung
+                        let scale: CGFloat
+                        if quality == .high {
+                            scale = 1.0
+                        } else {
+                            let isPortrait = effectiveBox.height > effectiveBox.width
+                            let targetDimension = CGFloat(quality.resolution)
+                            
+                            if isPortrait {
+                                scale = targetDimension / effectiveBox.height
+                            } else {
+                                scale = targetDimension / effectiveBox.width
+                            }
+                        }
+                        
+                        let padding: CGFloat = 2.0
+                        let finalWidth = Int(ceil(effectiveBox.width * scale + 2 * padding))
+                        let finalHeight = Int(ceil(effectiveBox.height * scale + 2 * padding))
+                        
+                        guard let bitmapRep = NSBitmapImageRep(
+                            bitmapDataPlanes: nil,
+                            pixelsWide: finalWidth,
+                            pixelsHigh: finalHeight,
+                            bitsPerSample: 8,
+                            samplesPerPixel: colorMode == .fullColor ? 4 : 1,
+                            hasAlpha: colorMode == .fullColor,
+                            isPlanar: false,
+                            colorSpaceName: colorMode == .fullColor ? .deviceRGB : .calibratedWhite,
+                            bitmapFormat: colorMode == .fullColor ? .alphaFirst : [],
+                            bytesPerRow: 0,
+                            bitsPerPixel: colorMode == .fullColor ? 32 : 8
+                        ) else {
+                            continuation.resume()
+                            return
+                        }
+                        
+                        Task { @MainActor in
+                            NSGraphicsContext.saveGraphicsState()
+                            if let graphicsContext = NSGraphicsContext(bitmapImageRep: bitmapRep) {
+                                graphicsContext.shouldAntialias = true
+                                graphicsContext.imageInterpolation = .high
+                                NSGraphicsContext.current = graphicsContext
+                                
+                                let cgContext = graphicsContext.cgContext
+                                
+                                // Weißer Hintergrund
+                                NSColor.white.setFill()
+                                NSRect(x: 0, y: 0, width: finalWidth, height: finalHeight).fill()
+                                
+                                // Korrekte Transformation
+                                cgContext.translateBy(x: padding, y: padding)
+                                cgContext.scaleBy(x: scale, y: scale)
+                                cgContext.translateBy(x: -effectiveBox.origin.x, y: -effectiveBox.origin.y)
+                                
+                                // Zeichne die PDF-Seite
+                                page.draw(with: .cropBox, to: cgContext)
+                            }
+                            NSGraphicsContext.restoreGraphicsState()
+                            
+                            // Komprimiere und füge die Seite hinzu
+                            if let compressedData = bitmapRep.representation(
+                                using: .jpeg,
+                                properties: [
+                                    .compressionFactor: quality.compressionFactor,
+                                    .progressive: true
+                                ]
+                            ),
+                            let compressedImage = NSImage(data: compressedData) {
+                                compressedImage.size = effectiveBox.size
+                                
+                                if let newPage = PDFPage(image: compressedImage) {
+                                    newPage.setBounds(mediaBox, for: .mediaBox)
+                                    if !cropBox.isEmpty {
+                                        newPage.setBounds(cropBox, for: .cropBox)
+                                    }
+                                    outputPDFDocument.insert(newPage, at: pageIndex)
+                                }
+                            }
+                            
+                            continuation.resume()
+                        }
+                    } catch {
+                        continuation.resume(throwing: error)
                     }
                 }
             }
