@@ -8,4 +8,51 @@
 "Minimale Komprimierung mit kaum wahrnehmbaren Qualitätseinbußen. Perfekt für hochwertige Präsentationen und Dokumente mit vielen Bildern." = "Minimale Komprimierung mit kaum wahrnehmbaren Qualitätseinbußen. Perfekt für hochwertige Präsentationen und Dokumente mit vielen Bildern.";
 "Leichte Komprimierung mit minimalen Qualitätseinbußen. Ideal für Präsentationen und Dokumente mit Bildern." = "Leichte Komprimierung mit minimalen Qualitätseinbußen. Ideal für Präsentationen und Dokumente mit Bildern.";
 "Ausgewogene Komprimierung mit gutem Verhältnis zwischen Qualität und Dateigröße." = "Ausgewogene Komprimierung mit gutem Verhältnis zwischen Qualität und Dateigröße.";
-"Maximale Komprimierung mit sichtbaren Qualitätseinbußen. Geeignet wenn Dateigröße wichtiger ist als Qualität." = "Maximale Komprimierung mit sichtbaren Qualitätseinbußen. Geeignet wenn Dateigröße wichtiger ist als Qualität."; 
+"Maximale Komprimierung mit sichtbaren Qualitätseinbußen. Geeignet wenn Dateigröße wichtiger ist als Qualität." = "Maximale Komprimierung mit sichtbaren Qualitätseinbußen. Geeignet wenn Dateigröße wichtiger ist als Qualität.";
+
+"Version" = "Version";
+"Build" = "Build";
+"Entwickler" = "Entwickler";
+"Website" = "Website";
+"Kontakt" = "Kontakt";
+"Komprimierung abgeschlossen" = "Komprimierung abgeschlossen";
+"Original Größe" = "Original Größe";
+"Komprimierte Größe" = "Komprimierte Größe";
+"Einsparung" = "Einsparung";
+"PDF hier ablegen" = "PDF hier ablegen";
+"PDF hierher ziehen" = "PDF hierher ziehen";
+"PDF Kompressor" = "PDF Kompressor";
+"Allgemein" = "Allgemein";
+"Info" = "Info";
+"Einstellungen" = "Einstellungen";
+"Abbrechen" = "Abbrechen";
+"Fehler beim Komprimieren: " = "Fehler beim Komprimieren: ";
+"PDF konnte nicht geladen werden" = "PDF konnte nicht geladen werden";
+"Keine Größenreduzierung möglich" = "Keine Größenreduzierung möglich";
+
+// Drag & Drop
+"PDF hier reinziehen" = "PDF hier reinziehen";
+"oder" = "oder";
+"PDF hier ablegen zum Komprimieren" = "PDF hier ablegen zum Komprimieren";
+"PDF hier reinziehen oder" = "PDF hier reinziehen oder";
+"zum Komprimieren" = "zum Komprimieren";
+"PDF auswählen..." = "PDF auswählen...";
+
+// Farbmodus
+"Voller Farbraum" = "Voller Farbraum";
+"Vollfarbe" = "Vollfarbe";
+"Graustufen" = "Graustufen";
+"Farbmodus" = "Farbmodus";
+
+// Menü
+"Einstellungen..." = "Einstellungen...";
+"Über PDF Kompressor" = "Über PDF Kompressor";
+"PDF Kompressor beenden" = "PDF Kompressor beenden";
+"Fenster" = "Fenster";
+"Verkleinern" = "Verkleinern";
+"Zoomen" = "Zoomen";
+"Alles nach vorne bringen" = "Alles nach vorne bringen";
+"Hilfe" = "Hilfe";
+"PDF Kompressor Hilfe" = "PDF Kompressor Hilfe";
+"Datei" = "Datei";
+"Schließen" = "Schließen"; 
