@@ -28,6 +28,10 @@ struct ContentView: View {
                     compressedSize: result.compressedSize,
                     originalName: result.fileName
                 )
+            } else if pdfCompressor.isCompressing, let fileName = pdfCompressor.currentFileName {
+                CompressingPDFView(fileName: fileName)
+            } else if let fileName = pdfCompressor.noReductionFile {
+                NoReductionView(fileName: fileName)
             } else {
                 // Content-Layer
                 VStack(spacing: 16) {
@@ -52,7 +56,7 @@ struct ContentView: View {
                 }
             }
         }
-        .frame(minWidth: 500, minHeight: 400)
+        .frame(minWidth: 500, minHeight: 600)
         .onDrop(of: [.fileURL], isTargeted: $isDropTargeted) { providers in
             handleDrop(providers: providers)
             return true
@@ -82,7 +86,11 @@ struct ContentView: View {
                 }
                 
                 Task {
-                    await pdfCompressor.compress(pdfAt: url)
+                    do {
+                        try await pdfCompressor.compress(pdfAt: url)
+                    } catch {
+                        print("❌ Fehler beim Komprimieren: \(error)")
+                    }
                 }
             }
         }
@@ -99,7 +107,11 @@ struct ContentView: View {
                 }
                 
                 Task { @MainActor in
-                    await pdfCompressor.compress(pdfAt: url)
+                    do {
+                        try await pdfCompressor.compress(pdfAt: url)
+                    } catch {
+                        print("❌ Fehler beim Drop-Komprimieren: \(error)")
+                    }
                 }
             }
         }

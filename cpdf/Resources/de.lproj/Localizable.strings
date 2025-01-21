@@ -1,0 +1,11 @@
+"Keine Kompression" = "Keine Kompression";
+"Minimal (1440p)" = "Minimal (1440p)";
+"Leicht (1080p)" = "Leicht (1080p)";
+"Mittel (720p)" = "Mittel (720p)";
+"Stark (480p)" = "Stark (480p)";
+
+"Optimiert die PDF ohne sichtbare Qualitätsverluste. Ideal für Dokumente mit hohen Qualitätsanforderungen." = "Optimiert die PDF ohne sichtbare Qualitätsverluste. Ideal für Dokumente mit hohen Qualitätsanforderungen.";
+"Minimale Komprimierung mit kaum wahrnehmbaren Qualitätseinbußen. Perfekt für hochwertige Präsentationen und Dokumente mit vielen Bildern." = "Minimale Komprimierung mit kaum wahrnehmbaren Qualitätseinbußen. Perfekt für hochwertige Präsentationen und Dokumente mit vielen Bildern.";
+"Leichte Komprimierung mit minimalen Qualitätseinbußen. Ideal für Präsentationen und Dokumente mit Bildern." = "Leichte Komprimierung mit minimalen Qualitätseinbußen. Ideal für Präsentationen und Dokumente mit Bildern.";
+"Ausgewogene Komprimierung mit gutem Verhältnis zwischen Qualität und Dateigröße." = "Ausgewogene Komprimierung mit gutem Verhältnis zwischen Qualität und Dateigröße.";
+"Maximale Komprimierung mit sichtbaren Qualitätseinbußen. Geeignet wenn Dateigröße wichtiger ist als Qualität." = "Maximale Komprimierung mit sichtbaren Qualitätseinbußen. Geeignet wenn Dateigröße wichtiger ist als Qualität."; 

@@ -3,163 +3,175 @@ import Foundation
 
 struct SettingsView: View {
     let onDismiss: () -> Void
+    
+    // MARK: - Properties
     @AppStorage("appLanguage") private var appLanguage = Language.german.rawValue
     @AppStorage("colorMode") private var colorMode = ColorMode.fullColor.rawValue
     @AppStorage("compressionQuality") private var compressionQuality = CompressionQuality.medium.rawValue
+    
     @State private var showingRestartAlert = false
+    @State private var selectedTab = "General"
+    
+    // MARK: - State Properties
     @State private var selectedLanguage: Language
     @State private var selectedColorMode: ColorMode
     @State private var selectedQuality: CompressionQuality
-    @State private var selectedTab = "General"
     
+    // MARK: - Initialization
     init(onDismiss: @escaping () -> Void) {
         self.onDismiss = onDismiss
-        // Initialisiere alle Einstellungen mit den gespeicherten Werten
-        let currentLanguage = UserDefaults.standard.string(forKey: "appLanguage") ?? Language.german.rawValue
-        let currentColorMode = UserDefaults.standard.string(forKey: "colorMode") ?? ColorMode.fullColor.rawValue
-        let currentQuality = UserDefaults.standard.string(forKey: "compressionQuality") ?? CompressionQuality.medium.rawValue
         
-        _selectedLanguage = State(initialValue: Language(rawValue: currentLanguage) ?? .german)
-        _selectedColorMode = State(initialValue: ColorMode(rawValue: currentColorMode) ?? .fullColor)
-        _selectedQuality = State(initialValue: CompressionQuality(rawValue: currentQuality) ?? .medium)
+        // Initialisiere State Properties
+        let defaults = UserDefaults.standard
+        let languageValue = defaults.string(forKey: "appLanguage") ?? Language.german.rawValue
+        let colorValue = defaults.string(forKey: "colorMode") ?? ColorMode.fullColor.rawValue
+        let qualityValue = defaults.string(forKey: "compressionQuality") ?? CompressionQuality.medium.rawValue
+        
+        _selectedLanguage = State(initialValue: Language(rawValue: languageValue) ?? .german)
+        _selectedColorMode = State(initialValue: ColorMode(rawValue: colorValue) ?? .fullColor)
+        _selectedQuality = State(initialValue: CompressionQuality(rawValue: qualityValue) ?? .medium)
     }
     
+    // MARK: - Body
     var body: some View {
         VStack(spacing: 0) {
-            // Titelleiste
-            Text("Settings")
-                .font(.system(size: 13, weight: .bold))
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 6)
-                .background(Color(NSColor.windowBackgroundColor))
-            
-            // Tabs
-            HStack(spacing: 0) {
-                TabButton(title: "General", icon: "gearshape.fill", isSelected: selectedTab == "General") {
-                    selectedTab = "General"
-                }
-                
-                TabButton(title: "Info", icon: "info.circle.fill", isSelected: selectedTab == "Info") {
-                    selectedTab = "Info"
-                }
-            }
-            .padding(.horizontal, 2)
-            .padding(.vertical, 2)
-            
+            titleBar
+            tabBar
             Divider()
-            
-            // Content
-            if selectedTab == "General" {
-                ScrollView {
-                    VStack(spacing: 20) {
-                        // Sprache
-                        GroupBox {
-                            Picker(LocalizedStringKey("Sprache"), selection: $selectedLanguage) {
-                                ForEach(Language.allCases) { language in
-                                    Text(language.displayName).tag(language)
-                                }
-                            }
-                            .onChange(of: selectedLanguage) { oldValue, newValue in
-                                if appLanguage != newValue.rawValue {
-                                    appLanguage = newValue.rawValue
-                                    showingRestartAlert = true
-                                }
-                            }
-                        } label: {
-                            Text(LocalizedStringKey("Sprache / Language"))
-                                .font(.headline)
-                        }
-                        .background(Color(NSColor.windowBackgroundColor))
-                        
-                        // PDF Komprimierung
-                        GroupBox {
-                            VStack(alignment: .leading, spacing: 12) {
-                                Picker(LocalizedStringKey("Kompressionsgrad"), selection: $selectedQuality) {
-                                    ForEach(CompressionQuality.allCases) { quality in
-                                        Text(quality.displayName).tag(quality)
-                                    }
-                                }
-                                
-                                Text(LocalizedStringKey("Niedrigere Auflösung = kleinere Dateien"))
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                
-                                Picker(LocalizedStringKey("Farbmodus"), selection: $selectedColorMode) {
-                                    ForEach(ColorMode.allCases) { mode in
-                                        Text(mode.displayName).tag(mode)
-                                    }
-                                }
-                            }
-                        } label: {
-                            Text(LocalizedStringKey("PDF Komprimierung"))
-                                .font(.headline)
-                        }
-                        .background(Color(NSColor.windowBackgroundColor))
-                    }
-                    .padding()
-                }
-                .background(Color(NSColor.windowBackgroundColor))
-            } else {
-                // Info Tab
-                ScrollView {
-                    VStack(spacing: 20) {
-                        GroupBox {
-                            VStack(alignment: .leading, spacing: 8) {
-                                InfoRow(label: "Version", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")
-                                InfoRow(label: "Build", value: Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1")
-                            }
-                        } label: {
-                            Text("App Information")
-                                .font(.headline)
-                        }
-                    }
-                    .padding()
-                }
-                .background(Color(NSColor.windowBackgroundColor))
-            }
+            contentView
         }
-        .overlay(
-            Button(LocalizedStringKey("Done")) {
-                onDismiss()
-            }
-            .keyboardShortcut(.escape, modifiers: [])
-            .buttonStyle(.borderedProminent)
-            .padding(16),
-            alignment: .bottomTrailing
-        )
+        .overlay(doneButton, alignment: .bottomTrailing)
         .frame(width: 500, height: 400)
         .background(Color(NSColor.windowBackgroundColor))
-        .onChange(of: selectedColorMode) { oldValue, newValue in
-            if colorMode != newValue.rawValue {
-                colorMode = newValue.rawValue
+        .setupSettingsHandlers(
+            colorMode: $colorMode,
+            selectedColorMode: $selectedColorMode,
+            compressionQuality: $compressionQuality,
+            selectedQuality: $selectedQuality
+        )
+        .alert(isPresented: $showingRestartAlert) {
+            restartAlert
+        }
+    }
+}
+
+// MARK: - View Components
+private extension SettingsView {
+    var titleBar: some View {
+        Text("Settings")
+            .font(.system(size: 13, weight: .bold))
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 6)
+            .background(Color(NSColor.windowBackgroundColor))
+    }
+    
+    var tabBar: some View {
+        HStack(spacing: 0) {
+            TabButton(
+                title: "General",
+                icon: "gearshape.fill",
+                isSelected: selectedTab == "General"
+            ) {
+                selectedTab = "General"
+            }
+            
+            TabButton(
+                title: "Info",
+                icon: "info.circle.fill",
+                isSelected: selectedTab == "Info"
+            ) {
+                selectedTab = "Info"
             }
         }
-        .onChange(of: selectedQuality) { oldValue, newValue in
-            if compressionQuality != newValue.rawValue {
-                compressionQuality = newValue.rawValue
+        .padding(.horizontal, 2)
+        .padding(.vertical, 2)
+    }
+    
+    var contentView: some View {
+        Group {
+            if selectedTab == "General" {
+                GeneralSettingsView(
+                    selectedLanguage: $selectedLanguage,
+                    selectedColorMode: $selectedColorMode,
+                    selectedQuality: $selectedQuality,
+                    showingRestartAlert: $showingRestartAlert,
+                    appLanguage: $appLanguage
+                )
+            } else {
+                InfoSettingsView()
             }
         }
-        .alert("Neustart erforderlich", isPresented: $showingRestartAlert) {
-            Button("Später") {
-                // Der Benutzer möchte später neustarten
+    }
+    
+    @ViewBuilder
+    func tabContent(_ tab: SettingsTab) -> some View {
+        switch tab {
+        case .general:
+            GeneralSettingsView(
+                selectedLanguage: $selectedLanguage,
+                selectedColorMode: $selectedColorMode,
+                selectedQuality: $selectedQuality,
+                showingRestartAlert: $showingRestartAlert,
+                appLanguage: $appLanguage
+            )
+        case .info:
+            InfoSettingsView()
+        }
+    }
+    
+    var doneButton: some View {
+        Button(LocalizedStringKey("Done")) {
+            onDismiss()
+        }
+        .keyboardShortcut(.escape, modifiers: [])
+        .buttonStyle(.borderedProminent)
+        .padding(16)
+    }
+    
+    var restartAlert: Alert {
+        Alert(
+            title: Text("Neustart erforderlich"),
+            message: Text(LocalizedStringKey("Bitte starten Sie die App neu, damit die Sprachänderungen wirksam werden.")),
+            primaryButton: .default(Text("Später")),
+            secondaryButton: .default(Text("Jetzt neustarten")) {
+                handleRestart()
             }
-            Button("Jetzt neustarten") {
-                // Erst Settings schließen
-                onDismiss()
-                
-                // Kurze Verzögerung für sauberes Schließen
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    // Starte die App neu
-                    let url = Bundle.main.bundleURL
-                    let configuration = NSWorkspace.OpenConfiguration()
-                    NSWorkspace.shared.openApplication(at: url,
-                                                     configuration: configuration) { _, _ in
-                        NSApplication.shared.terminate(nil)
-                    }
-                }
+        )
+    }
+}
+
+// MARK: - Helper Methods
+private extension SettingsView {
+    func handleRestart() {
+        onDismiss()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            let url = Bundle.main.bundleURL
+            let configuration = NSWorkspace.OpenConfiguration()
+            NSWorkspace.shared.openApplication(at: url,
+                                             configuration: configuration) { _, _ in
+                NSApplication.shared.terminate(nil)
             }
-        } message: {
-            Text(LocalizedStringKey("Bitte starten Sie die App neu, damit die Sprachänderungen wirksam werden."))
+        }
+    }
+}
+
+// MARK: - Setup Handlers
+extension View {
+    func setupSettingsHandlers(
+        colorMode: Binding<String>,
+        selectedColorMode: Binding<ColorMode>,
+        compressionQuality: Binding<String>,
+        selectedQuality: Binding<CompressionQuality>
+    ) -> some View {
+        self.onChange(of: selectedColorMode.wrappedValue) { oldValue, newValue in
+            if colorMode.wrappedValue != newValue.rawValue {
+                colorMode.wrappedValue = newValue.rawValue
+            }
+        }
+        .onChange(of: selectedQuality.wrappedValue) { oldValue, newValue in
+            if compressionQuality.wrappedValue != newValue.rawValue {
+                compressionQuality.wrappedValue = newValue.rawValue
+            }
         }
     }
 }

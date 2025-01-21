@@ -1,22 +1,45 @@
 import AppKit
 import SwiftUI
+import UserNotifications
 
 class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     @Published var settingsWindow: NSWindow?
     @Published var isSettingsPresented = false
     
+    private var aboutPanelOptions: [NSApplication.AboutPanelOptionKey: Any]?
+    
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // Konfiguriere das About-Panel
-        if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String,
-           let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
-            let aboutInfo: [NSApplication.AboutPanelOptionKey: Any] = [
-                .version: version,
-                .applicationVersion: build,
-                .credits: "© 2024 JulB3y"
-            ]
-            NSApplication.shared.orderFrontStandardAboutPanel(options: aboutInfo)
-            NSApplication.shared.activate(ignoringOtherApps: true)
+        // Registriere für Benachrichtigungen
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
+            if let error = error {
+                print("❌ Fehler bei der Benachrichtigungserlaubnis: \(error)")
+            }
         }
+        
+        // Setze das Dock-Icon
+        if let appIcon = NSImage(named: "AppIcon") {
+            NSApplication.shared.applicationIconImage = appIcon
+        }
+        
+        // Bereite About-Panel Optionen vor
+        let credits = """
+        © 2024 Julius Beyer
+        """
+        
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.0"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
+        
+        // Speichere die Optionen für späteren Gebrauch
+        aboutPanelOptions = [
+            .credits: NSAttributedString(
+                string: credits,
+                attributes: [
+                    .font: NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
+                ]
+            ),
+            .version: version,
+            .applicationVersion: build
+        ]
     }
     
     @objc func openSettings() {
@@ -54,5 +77,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         
         isSettingsPresented = true
         NSApplication.shared.activate(ignoringOtherApps: true)
+    }
+    
+    @objc func showAboutPanel() {
+        if let options = aboutPanelOptions {
+            NSApplication.shared.orderFrontStandardAboutPanel(options: options)
+            NSApplication.shared.activate(ignoringOtherApps: true)
+        }
+    }
+    
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        return true
     }
 } 

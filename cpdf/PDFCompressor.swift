@@ -11,10 +11,13 @@ import PDFKit
 class PDFCompressor: ObservableObject {
     @Published var isCompressing = false
     @Published var compressionResult: (originalSize: Int64, compressedSize: Int64, fileName: String)?
+    @Published var noReductionFile: String?
+    @Published var currentFileName: String?
     
-    // Neue Properties für die URLs
     var lastOriginalURL: URL?
     var lastCompressedURL: URL?
+    
+    private var pendingCompression: (url: URL, size: Int)?
     
     func compressPDF() {
         let panel = NSOpenPanel()
@@ -31,200 +34,231 @@ class PDFCompressor: ObservableObject {
         // Erlaubt Zugriff auf iCloud Drive und andere Ordner
         panel.directoryURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
         
-        panel.begin { response in
+        panel.begin { [weak self] response in
             if response == .OK, let url = panel.url {
                 Task {
-                    await self.compress(pdfAt: url)
+                    do {
+                        try await self?.compress(pdfAt: url)
+                    } catch {
+                        print("❌ Fehler beim Komprimieren: \(error)")
+                    }
                 }
             }
         }
     }
     
-    func compress(pdfAt url: URL) async {
-        guard let pdfDocument = PDFDocument(url: url) else {
-            print("❌ Fehler: Konnte PDF nicht laden")
-            return
-        }
-        
-        print("📄 Originale PDF geladen: \(url.lastPathComponent)")
-        
+    func compress(pdfAt url: URL) async throws {
+        self.lastOriginalURL = url
+        self.currentFileName = url.lastPathComponent
         let parentDirectory = url.deletingLastPathComponent()
         
-        // Frage nach Zugriffsberechtigung
         if BookmarkManager.shared.requestFolderAccess(for: parentDirectory) {
-            self.isCompressing = true
-            
-            do {
-                try await processCompression(pdfDocument: pdfDocument, originalURL: url, parentDirectory: parentDirectory)
-            } catch {
-                print("❌ Fehler bei der Komprimierung: \(error)")
-                self.showNotification("Fehler beim Komprimieren: \(error.localizedDescription)")
+            await MainActor.run {
+                self.isCompressing = true
+                self.compressionResult = nil
+                self.noReductionFile = nil
             }
-        } else {
-            print("❌ Keine Schreibberechtigung erhalten für: \(parentDirectory.path)")
-            self.showNotification("Keine Schreibberechtigung für den Ordner erhalten")
+            
+            if let originalSize = try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize {
+                pendingCompression = (url: url, size: originalSize)
+            }
         }
     }
     
-    private func processCompression(pdfDocument: PDFDocument, originalURL: URL, parentDirectory: URL) async throws {
-        let originalFileName = originalURL.lastPathComponent
-        let tempFileURL = FileManager.default.temporaryDirectory.appendingPathComponent("temp_\(originalFileName)")
-        
-        print("🔄 Starte Komprimierung...")
-        
-        defer {
-            self.isCompressing = false
-            // Lösche temporäre Datei falls vorhanden
-            try? FileManager.default.removeItem(at: tempFileURL)
-        }
+    func finishCompression() async throws {
+        guard let pending = pendingCompression else { return }
         
         do {
-            let outputPDFDocument = PDFDocument()
-            
-            // Setze PDF-Metadaten
-            let metadata: [AnyHashable: Any] = [
-                kCGPDFContextCreator: "PDF Kompressor",
-                kCGPDFContextAuthor: NSUserName(),
-                kCGPDFContextTitle: originalFileName
-            ]
-            
-            // Hole die Einstellungen
-            let qualityMode = CompressionQuality(rawValue: UserDefaults.standard.string(forKey: "compressionQuality") ?? "medium") ?? .medium
-            let colorMode = ColorMode(rawValue: UserDefaults.standard.string(forKey: "colorMode") ?? "full") ?? .fullColor
-            
-            for pageIndex in 0..<pdfDocument.pageCount {
-                autoreleasepool {
-                    guard let page = pdfDocument.page(at: pageIndex) else { return }
-                    
-                    let pageRect = page.bounds(for: .mediaBox)
-                    let targetResolution = qualityMode.resolution
-                    
-                    // Bestimme die kürzere Seite und berechne die Skalierung
-                    let shortestSide = min(pageRect.width, pageRect.height)
-                    let longestSide = max(pageRect.width, pageRect.height)
-                    
-                    // Berechne die finalen Dimensionen
-                    var finalWidth: CGFloat
-                    var finalHeight: CGFloat
-                    var scale: CGFloat
-                    
-                    if pageRect.width < pageRect.height {
-                        // Breite ist die kürzere Seite
-                        finalWidth = CGFloat(targetResolution)
-                        scale = finalWidth / pageRect.width
-                        finalHeight = pageRect.height * scale
-                    } else {
-                        // Höhe ist die kürzere Seite
-                        finalHeight = CGFloat(targetResolution)
-                        scale = finalHeight / pageRect.height
-                        finalWidth = pageRect.width * scale
-                    }
-                    
-                    // Bitmap-Kontext basierend auf ColorMode
-                    guard let bitmapRep = NSBitmapImageRep(
-                        bitmapDataPlanes: nil,
-                        pixelsWide: Int(finalWidth),
-                        pixelsHigh: Int(finalHeight),
-                        bitsPerSample: 8,
-                        samplesPerPixel: colorMode == .fullColor ? 4 : 1,
-                        hasAlpha: colorMode == .fullColor,
-                        isPlanar: false,
-                        colorSpaceName: colorMode == .fullColor ? .deviceRGB : .calibratedWhite,
-                        bitmapFormat: colorMode == .fullColor ? .alphaFirst : [],
-                        bytesPerRow: 0,
-                        bitsPerPixel: colorMode == .fullColor ? 32 : 8
-                    ) else { return }
-                    
-                    NSGraphicsContext.saveGraphicsState()
-                    if let graphicsContext = NSGraphicsContext(bitmapImageRep: bitmapRep) {
-                        graphicsContext.shouldAntialias = true
-                        graphicsContext.imageInterpolation = .high
-                        NSGraphicsContext.current = graphicsContext
-                        
-                        graphicsContext.cgContext.scaleBy(x: scale, y: scale)
-                        
-                        // Weißer Hintergrund
-                        NSColor.white.setFill()
-                        NSRect(origin: .zero, size: pageRect.size).fill()
-                        
-                        // Zeichne die PDF-Seite
-                        page.draw(with: .mediaBox, to: graphicsContext.cgContext)
-                    }
-                    NSGraphicsContext.restoreGraphicsState()
-                    
-                    // Erstelle eine neue PDF-Seite aus dem komprimierten Bild
-                    if let compressedData = bitmapRep.representation(
-                        using: .jpeg,
-                        properties: [
-                            .compressionFactor: qualityMode.compressionFactor,
-                            .progressive: true
-                        ]
-                    ),
-                    let compressedImage = NSImage(data: compressedData) {
-                        compressedImage.size = pageRect.size
-                        if let newPage = PDFPage(image: compressedImage) {
-                            newPage.setBounds(pageRect, for: .mediaBox)
-                            outputPDFDocument.insert(newPage, at: pageIndex)
-                        }
-                    }
-                }
+            // 1. Technische Optimierung durch PDFOptimizer
+            let optimizedURL: URL
+            do {
+                optimizedURL = try await PDFOptimizer.shared.optimizePDF(at: pending.url)
+            } catch let optimizerError as NSError where optimizerError.domain == "PDFOptimizer" && optimizerError.code == 2 {
+                // Wenn keine Größenreduzierung möglich war, nutze Original für visuelle Komprimierung
+                print("ℹ️ PDFOptimizer: Keine Größenreduzierung möglich, fahre mit visueller Komprimierung fort")
+                optimizedURL = pending.url
+            } catch {
+                // Bei anderen Fehlern auch mit Original fortfahren
+                print("⚠️ PDFOptimizer fehlgeschlagen, fahre mit visueller Komprimierung fort: \(error)")
+                optimizedURL = pending.url
             }
             
-            // Speichere die komprimierte PDF mit Metadaten
-            let pdfData = NSMutableData()
-            if let consumer = CGDataConsumer(data: pdfData),
-               let context = CGContext(consumer: consumer, mediaBox: nil, metadata as CFDictionary) {
+            // 2. Visuelle Komprimierung basierend auf Qualitätseinstellung
+            let qualityMode = UserDefaults.standard.compressionQuality
+            let finalURL = try await applyVisualCompression(to: optimizedURL, quality: qualityMode)
+            
+            // Größenvergleich mit Original
+            let originalSize = pending.size
+            let finalSize = try finalURL.resourceValues(forKeys: [URLResourceKey.fileSizeKey]).fileSize ?? 0
+            
+            if finalSize < originalSize {
+                // Ersetze Original mit komprimierter Version
+                try moveToTrash(pending.url)
+                try FileManager.default.moveItem(at: finalURL, to: pending.url)
                 
-                for pageIndex in 0..<outputPDFDocument.pageCount {
-                    if let page = outputPDFDocument.page(at: pageIndex) {
-                        let pageRect = page.bounds(for: .mediaBox)
-                        var mediaBoxRect = CGRect(x: pageRect.origin.x,
-                                                y: pageRect.origin.y,
-                                                width: pageRect.width,
-                                                height: pageRect.height)
-                        context.beginPage(mediaBox: &mediaBoxRect)
-                        page.draw(with: .mediaBox, to: context)
-                        context.endPage()
-                    }
+                // Cleanup der Zwischenversion nur wenn sie nicht das Original war
+                if optimizedURL != pending.url {
+                    try? FileManager.default.removeItem(at: optimizedURL)
                 }
-                context.closePDF()
                 
-                // Speichere zunächst in temporäre Datei
-                try (pdfData as Data).write(to: tempFileURL)
-            } else {
-                throw NSError(domain: "PDFCompressor", code: 3, userInfo: [NSLocalizedDescriptionKey: "Konnte PDF nicht speichern"])
-            }
-            
-            // Überprüfe die Größen
-            let originalSize = try FileManager.default.attributesOfItem(atPath: originalURL.path)[.size] as? Int64 ?? 0
-            let compressedSize = try FileManager.default.attributesOfItem(atPath: tempFileURL.path)[.size] as? Int64 ?? 0
-            let savings = Double(originalSize - compressedSize) / Double(originalSize) * 100
-            
-            if savings > 0 {
-                do {
-                    // Verschiebe Original in den Papierkorb
-                    try FileManager.default.trashItem(at: originalURL, resultingItemURL: nil)
-                    print("🗑️ Original in den Papierkorb verschoben")
-                    
-                    // Verschiebe komprimierte Version an den ursprünglichen Speicherort
-                    try FileManager.default.moveItem(at: tempFileURL, to: originalURL)
-                    
-                    self.showNotification("PDF wurde komprimiert (Einsparung: \(String(format: "%.1f", savings))%)")
-                    self.compressionResult = (originalSize, compressedSize, originalFileName)
-                    self.lastOriginalURL = originalURL
-                    self.lastCompressedURL = originalURL
-                } catch {
-                    // Wenn etwas schief geht, versuche das Original wiederherzustellen
-                    print("❌ Fehler beim Ersetzen der Datei: \(error)")
-                    throw error
+                await MainActor.run {
+                    self.compressionResult = (
+                        originalSize: Int64(originalSize),
+                        compressedSize: Int64(finalSize),
+                        fileName: pending.url.lastPathComponent
+                    )
+                    self.noReductionFile = nil
+                    self.isCompressing = false
+                    self.currentFileName = nil
                 }
             } else {
-                throw NSError(domain: "PDFCompressor", code: 2, userInfo: [NSLocalizedDescriptionKey: "Keine Größenreduzierung möglich"])
+                // Cleanup der temporären Dateien
+                try? FileManager.default.removeItem(at: finalURL)
+                if optimizedURL != pending.url {
+                    try? FileManager.default.removeItem(at: optimizedURL)
+                }
+                
+                await MainActor.run {
+                    self.compressionResult = nil
+                    self.noReductionFile = pending.url.lastPathComponent
+                    self.isCompressing = false
+                    self.currentFileName = nil
+                }
+                
+                throw NSError(
+                    domain: "PDFCompressor",
+                    code: 2,
+                    userInfo: [NSLocalizedDescriptionKey: "Keine Größenreduzierung möglich"]
+                )
             }
-            
         } catch {
+            // Cleanup bei Fehlern
+            print("❌ Fehler bei der Komprimierung: \(error)")
+            self.compressionResult = nil
+            self.noReductionFile = nil
+            self.isCompressing = false
+            self.currentFileName = nil
+            self.showNotification("Fehler beim Komprimieren: \(error.localizedDescription)")
             throw error
         }
+        
+        self.pendingCompression = nil
+    }
+    
+    private func applyVisualCompression(to url: URL, quality: CompressionQuality) async throws -> URL {
+        guard let pdfDocument = PDFDocument(url: url) else {
+            throw NSError(domain: "PDFCompressor", code: 4,
+                         userInfo: [NSLocalizedDescriptionKey: "PDF konnte nicht geladen werden"])
+        }
+        
+        let tempURL = url.deletingLastPathComponent()
+            .appendingPathComponent("visual_" + url.lastPathComponent)
+        
+        let outputPDFDocument = PDFDocument()
+        let colorMode = UserDefaults.standard.colorMode
+        
+        for pageIndex in 0..<pdfDocument.pageCount {
+            autoreleasepool {
+                guard let page = pdfDocument.page(at: pageIndex) else { return }
+                
+                let mediaBox = page.bounds(for: .mediaBox)
+                let cropBox = page.bounds(for: .cropBox)
+                let effectiveBox = cropBox.isEmpty ? mediaBox : cropBox
+                
+                // Berechne die Skalierung
+                let scale: CGFloat
+                if quality == .high {
+                    scale = 1.0
+                } else {
+                    let isPortrait = effectiveBox.height > effectiveBox.width
+                    let targetDimension = CGFloat(quality.resolution)
+                    
+                    if isPortrait {
+                        scale = targetDimension / effectiveBox.height
+                    } else {
+                        scale = targetDimension / effectiveBox.width
+                    }
+                }
+                
+                // Füge einen kleinen Rand hinzu für die Sicherheit
+                let padding: CGFloat = 2.0
+                let finalWidth = Int(ceil(effectiveBox.width * scale + 2 * padding))
+                let finalHeight = Int(ceil(effectiveBox.height * scale + 2 * padding))
+                
+                print("DEBUG: Seite \(pageIndex + 1):")
+                print("MediaBox: \(mediaBox)")
+                print("CropBox: \(cropBox)")
+                print("EffectiveBox: \(effectiveBox)")
+                print("Scale: \(scale)")
+                
+                guard let bitmapRep = NSBitmapImageRep(
+                    bitmapDataPlanes: nil,
+                    pixelsWide: finalWidth,
+                    pixelsHigh: finalHeight,
+                    bitsPerSample: 8,
+                    samplesPerPixel: colorMode == .fullColor ? 4 : 1,
+                    hasAlpha: colorMode == .fullColor,
+                    isPlanar: false,
+                    colorSpaceName: colorMode == .fullColor ? .deviceRGB : .calibratedWhite,
+                    bitmapFormat: colorMode == .fullColor ? .alphaFirst : [],
+                    bytesPerRow: 0,
+                    bitsPerPixel: colorMode == .fullColor ? 32 : 8
+                ) else { return }
+                
+                NSGraphicsContext.saveGraphicsState()
+                if let graphicsContext = NSGraphicsContext(bitmapImageRep: bitmapRep) {
+                    graphicsContext.shouldAntialias = true
+                    graphicsContext.imageInterpolation = .high
+                    NSGraphicsContext.current = graphicsContext
+                    
+                    let cgContext = graphicsContext.cgContext
+                    
+                    // Weißer Hintergrund für das gesamte Bitmap
+                    NSColor.white.setFill()
+                    NSRect(x: 0, y: 0, width: finalWidth, height: finalHeight).fill()
+                    
+                    // Korrekte Transformation für PDF-Koordinaten
+                    cgContext.translateBy(x: padding, y: padding)  // Füge Padding hinzu
+                    cgContext.scaleBy(x: scale, y: scale)
+                    
+                    // Verschiebe zum Ursprung der EffectiveBox
+                    cgContext.translateBy(x: -effectiveBox.origin.x, y: -effectiveBox.origin.y)
+                    
+                    // Zeichne die PDF-Seite
+                    page.draw(with: .cropBox, to: cgContext)
+                }
+                NSGraphicsContext.restoreGraphicsState()
+                
+                // Erstelle die neue Seite
+                if let compressedData = bitmapRep.representation(
+                    using: .jpeg,
+                    properties: [
+                        .compressionFactor: quality.compressionFactor,
+                        .progressive: true
+                    ]
+                ),
+                let compressedImage = NSImage(data: compressedData) {
+                    compressedImage.size = effectiveBox.size  // Setze die korrekte Größe
+                    
+                    if let newPage = PDFPage(image: compressedImage) {
+                        // Setze die originalen Bounds
+                        newPage.setBounds(mediaBox, for: .mediaBox)
+                        if !cropBox.isEmpty {
+                            newPage.setBounds(cropBox, for: .cropBox)
+                        }
+                        outputPDFDocument.insert(newPage, at: pageIndex)
+                    }
+                }
+            }
+        }
+        
+        outputPDFDocument.write(to: tempURL)
+        return tempURL
+    }
+    
+    func reset() {
+        compressionResult = nil
+        noReductionFile = nil
     }
     
     private func showNotification(_ message: String) {
@@ -237,6 +271,11 @@ class PDFCompressor: ObservableObject {
                                           trigger: nil)
         
         UNUserNotificationCenter.current().add(request)
+    }
+    
+    private func moveToTrash(_ url: URL) throws {
+        var resultingItemUrl: NSURL?
+        try FileManager.default.trashItem(at: url, resultingItemURL: &resultingItemUrl)
     }
 }
 

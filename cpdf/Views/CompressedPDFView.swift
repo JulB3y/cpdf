@@ -10,144 +10,87 @@ struct CompressedPDFView: View {
     let originalSize: Int64
     let compressedSize: Int64
     let originalName: String
-    @State private var originalPreview: NSImage?
-    @State private var compressedPreview: NSImage?
+    
+    @State private var thumbnail: NSImage?
     
     var body: some View {
-        VStack(spacing: 30) {
-            HStack {
-                Text(LocalizedStringKey("PDF Komprimierung"))
-                    .font(.title)
-                    .foregroundColor(.primary)
-                
-                Spacer()
-                
-                // Einstellungen-Button
-                Button {
-                    appDelegate.openSettings()
-                } label: {
-                    Image(systemName: "gearshape")
-                        .font(.title2)
-                }
-                .buttonStyle(.plain)
-            }
-            
-            HStack(spacing: 40) {
-                // Original PDF
-                VStack {
-                    if let preview = originalPreview {
-                        Image(nsImage: preview)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 100, height: 100)
-                            .padding()
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(style: StrokeStyle(lineWidth: 2, dash: [5]))
-                                    .foregroundColor(.gray)
-                            )
-                    } else {
-                        Image(systemName: "doc.fill")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 100, height: 100)
-                            .foregroundColor(.red)
-                            .padding()
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(style: StrokeStyle(lineWidth: 2, dash: [5]))
-                                    .foregroundColor(.gray)
-                            )
-                    }
-                    
-                    Text(ByteCountFormatter.string(fromByteCount: originalSize, countStyle: .file))
-                        .font(.headline)
-                }
-                
-                // Pfeil und Komprimierungsrate
-                VStack(alignment: .center, spacing: 8) {
-                    Image(systemName: "arrow.right")
+        VStack(spacing: 20) {
+            // PDF Preview
+            Group {
+                if let thumbnail = thumbnail {
+                    Image(nsImage: thumbnail)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(width: 30)
-                        .padding(.bottom, 4)
-                    
-                    VStack(spacing: 2) {
-                        Text(LocalizedStringKey("reduziert um"))
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                        .frame(maxWidth: 300, maxHeight: 400)
+                        .shadow(radius: 3)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Color(NSColor.windowBackgroundColor))
+                                .shadow(radius: 2)
+                        )
+                        .padding()
+                } else {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color(NSColor.windowBackgroundColor))
+                            .frame(width: 200, height: 280)
+                            .shadow(radius: 2)
                         
-                        Text(String(format: "%.1f%%", savings))
-                            .font(.headline)
-                            .bold()
-                            .foregroundColor(.green)
+                        ProgressView()
                     }
-                }
-                
-                // Komprimierte PDF
-                VStack {
-                    if let preview = compressedPreview {
-                        Image(nsImage: preview)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 100, height: 100)
-                            .padding()
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(style: StrokeStyle(lineWidth: 2, dash: [5]))
-                                    .foregroundColor(.gray)
-                            )
-                    } else {
-                        Image(systemName: "doc.fill")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 100, height: 100)
-                            .foregroundColor(.red)
-                            .padding()
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(style: StrokeStyle(lineWidth: 2, dash: [5]))
-                                    .foregroundColor(.gray)
-                            )
-                    }
-                    
-                    Text(ByteCountFormatter.string(fromByteCount: compressedSize, countStyle: .file))
-                        .font(.headline)
+                    .padding()
                 }
             }
-            .padding()
+            .frame(height: 300)
+            
+            // Compression Info
+            VStack(spacing: 12) {
+                Text(LocalizedStringKey("PDF Komprimierung"))
+                    .font(.headline)
+                
+                HStack(spacing: 16) {
+                    Text("\(formatFileSize(originalSize))")
+                        .foregroundColor(.secondary)
+                    Image(systemName: "arrow.right")
+                        .foregroundColor(.secondary)
+                    Text("\(formatFileSize(compressedSize))")
+                        .foregroundColor(.green)
+                }
+                
+                Text(LocalizedStringKey("reduziert um \(calculateReduction())%"))
+                    .foregroundColor(.secondary)
+                    .font(.subheadline)
+            }
             
             Button(LocalizedStringKey("Neue PDF komprimieren")) {
-                pdfCompressor.compressionResult = nil
+                pdfCompressor.reset()
             }
             .buttonStyle(.borderedProminent)
         }
         .padding()
-        .frame(width: 500, height: 400)
-        .task {
-            // Lade Vorschauen
-            if let originalURL = pdfCompressor.lastOriginalURL {
-                originalPreview = await generatePDFThumbnail(for: originalURL)
-            }
-            if let compressedURL = pdfCompressor.lastCompressedURL {
-                compressedPreview = await generatePDFThumbnail(for: compressedURL)
+        .onAppear {
+            loadThumbnail()
+        }
+    }
+    
+    private func loadThumbnail() {
+        Task {
+            if let url = pdfCompressor.lastOriginalURL {
+                thumbnail = try? await createThumbnail(from: url)
             }
         }
     }
     
-    // Berechnung der Einsparung in Prozent
-    private var savings: Double {
-        Double(originalSize - compressedSize) / Double(originalSize) * 100
-    }
-    
-    private func generatePDFThumbnail(for url: URL) async -> NSImage {
-        await withCheckedContinuation { continuation in
+    private func createThumbnail(from url: URL) async throws -> NSImage {
+        return await withCheckedContinuation { continuation in
             DispatchQueue.global(qos: .userInitiated).async {
-                // Erstelle ein Fallback-Bild für den Fehlerfall
-                let fallbackImage = NSImage(size: NSSize(width: 100, height: 100))
+                // Erstelle ein Fallback-Bild
+                let fallbackImage = NSImage(size: NSSize(width: 200, height: 280))
                 fallbackImage.lockFocus()
-                NSColor.systemRed.set()
+                NSColor.windowBackgroundColor.setFill()
                 NSBezierPath(rect: NSRect(origin: .zero, size: fallbackImage.size)).fill()
+                NSColor.systemRed.setFill()
+                NSBezierPath(ovalIn: NSRect(x: 50, y: 90, width: 100, height: 100)).fill()
                 fallbackImage.unlockFocus()
                 
                 // Versuche die PDF zu laden
@@ -161,28 +104,36 @@ struct CompressedPDFView: View {
                 
                 // Berechne das Seitenverhältnis und die Thumbnail-Größe
                 let aspectRatio = pageRect.width / pageRect.height
-                let thumbnailHeight: CGFloat = 100
-                let thumbnailWidth = thumbnailHeight * aspectRatio
-                let thumbnailSize = NSSize(width: thumbnailWidth, height: thumbnailHeight)
+                let maxHeight: CGFloat = 280
+                let maxWidth: CGFloat = 200
+                
+                let thumbnailSize: NSSize
+                if aspectRatio > 1 {
+                    // Breites Dokument
+                    thumbnailSize = NSSize(width: maxWidth, height: maxWidth / aspectRatio)
+                } else {
+                    // Hohes Dokument
+                    thumbnailSize = NSSize(width: maxHeight * aspectRatio, height: maxHeight)
+                }
                 
                 // Erstelle das Thumbnail
                 let thumbnail = NSImage(size: thumbnailSize)
                 thumbnail.lockFocus()
                 
                 if let context = NSGraphicsContext.current {
-                    // Setze Qualitätseinstellungen
+                    // Weißer Hintergrund
+                    NSColor.white.setFill()
+                    NSBezierPath(rect: NSRect(origin: .zero, size: thumbnailSize)).fill()
+                    
+                    // Qualitätseinstellungen
                     context.imageInterpolation = .high
                     context.shouldAntialias = true
                     
-                    // Weißer Hintergrund
-                    NSColor.white.setFill()
-                    NSRect(origin: .zero, size: thumbnailSize).fill()
-                    
-                    // Berechne die Skalierung
-                    let scale = thumbnailHeight / pageRect.height
-                    context.cgContext.scaleBy(x: scale, y: scale)
-                    
                     // Zeichne die PDF-Seite
+                    let scale = min(thumbnailSize.width / pageRect.width,
+                                  thumbnailSize.height / pageRect.height)
+                    
+                    context.cgContext.scaleBy(x: scale, y: scale)
                     pdfPage.draw(with: .mediaBox, to: context.cgContext)
                 }
                 
@@ -191,12 +142,27 @@ struct CompressedPDFView: View {
             }
         }
     }
+    
+    private func calculateReduction() -> Int {
+        guard originalSize > 0 else { return 0 }
+        let reduction = Double(originalSize - compressedSize) / Double(originalSize) * 100
+        return Int(reduction)
+    }
+    
+    private func formatFileSize(_ size: Int64) -> String {
+        let formatter = ByteCountFormatter()
+        formatter.allowedUnits = [.useKB, .useMB]
+        formatter.countStyle = .file
+        return formatter.string(fromByteCount: size)
+    }
 }
 
 #Preview {
     CompressedPDFView(
-        originalSize: 10_000_000,
-        compressedSize: 1_000_000,
-        originalName: "Dokument.pdf"
+        originalSize: 1_000_000,
+        compressedSize: 500_000,
+        originalName: "test.pdf"
     )
+    .environmentObject(PDFCompressor())
+    .environmentObject(AppDelegate())
 } 
