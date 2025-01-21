@@ -3,9 +3,81 @@
 "Leicht (1080p)" = "Light (1080p)";
 "Mittel (720p)" = "Medium (720p)";
 "Stark (480p)" = "High (480p)";
+"Sprache" = "Language";
+"Darstellung" = "Appearance";
+"Farbmodus" = "Color Mode";
+"PDF Komprimierung" = "PDF Compression";
+"Qualität" = "Quality";
+"Vollfarbe" = "Full Color";
+"Graustufen" = "Grayscale";
+"Deutsch" = "German";
+"Englisch" = "English";
+"Done" = "Done";
+"Später" = "Later";
+"Jetzt neustarten" = "Restart now";
+"Neustart erforderlich" = "Restart required";
+"Bitte starten Sie die App neu, damit die Sprachänderungen wirksam werden." = "Please restart the app for the language changes to take effect.";
+"Wählen Sie eine PDF zum Komprimieren" = "Select a PDF to compress";
+"PDF auswählen" = "Select PDF";
+"PDF wird komprimiert" = "Compressing PDF";
+"Komprimiere" = "Compressing";
 
 "Optimiert die PDF ohne sichtbare Qualitätsverluste. Ideal für Dokumente mit hohen Qualitätsanforderungen." = "Optimizes the PDF without visible quality loss. Ideal for documents with high quality requirements.";
 "Minimale Komprimierung mit kaum wahrnehmbaren Qualitätseinbußen. Perfekt für hochwertige Präsentationen und Dokumente mit vielen Bildern." = "Minimal compression with barely noticeable quality loss. Perfect for high-quality presentations and documents with many images.";
 "Leichte Komprimierung mit minimalen Qualitätseinbußen. Ideal für Präsentationen und Dokumente mit Bildern." = "Light compression with minimal quality loss. Ideal for presentations and documents with images.";
 "Ausgewogene Komprimierung mit gutem Verhältnis zwischen Qualität und Dateigröße." = "Balanced compression with good ratio between quality and file size.";
-"Maximale Komprimierung mit sichtbaren Qualitätseinbußen. Geeignet wenn Dateigröße wichtiger ist als Qualität." = "Maximum compression with visible quality loss. Suitable when file size is more important than quality."; 
+"Maximale Komprimierung mit sichtbaren Qualitätseinbußen. Geeignet wenn Dateigröße wichtiger ist als Qualität." = "Maximum compression with visible quality loss. Suitable when file size is more important than quality.";
+
+// Fehlermeldungen
+"Fehler beim Komprimieren: " = "Error while compressing: ";
+"PDF konnte nicht geladen werden" = "PDF could not be loaded";
+"Keine Größenreduzierung möglich" = "No size reduction possible";
+
+// Info View
+"Version" = "Version";
+"Build" = "Build";
+"Entwickler" = "Developer";
+"Website" = "Website";
+"Kontakt" = "Contact";
+
+// Erfolgs- und Status-Meldungen
+"Komprimierung abgeschlossen" = "Compression completed";
+"Original Größe" = "Original size";
+"Komprimierte Größe" = "Compressed size";
+"Einsparung" = "Savings";
+
+// Drag & Drop
+"PDF hier reinziehen" = "Drag PDF here";
+"oder" = "or";
+"PDF hier ablegen zum Komprimieren" = "Drop PDF here to compress";
+"PDF hier reinziehen oder" = "Drag PDF here or";
+"zum Komprimieren" = "to compress";
+"PDF auswählen..." = "Select PDF...";
+
+// Benachrichtigungen
+"PDF Kompressor" = "PDF Compressor";
+
+// Allgemein
+"Allgemein" = "General";
+"Info" = "Info";
+"Einstellungen" = "Settings";
+"Abbrechen" = "Cancel";
+
+// Farbmodus
+"Voller Farbraum" = "Full Color Space";
+"Vollfarbe" = "Full Color";
+"Graustufen" = "Grayscale";
+"Farbmodus" = "Color Mode";
+
+// Menü
+"Einstellungen..." = "Preferences...";
+"Über PDF Kompressor" = "About PDF Compressor";
+"PDF Kompressor beenden" = "Quit PDF Compressor";
+"Fenster" = "Window";
+"Verkleinern" = "Minimize";
+"Zoomen" = "Zoom";
+"Alles nach vorne bringen" = "Bring All to Front";
+"Hilfe" = "Help";
+"PDF Kompressor Hilfe" = "PDF Compressor Help";
+"Datei" = "File";
+"Schließen" = "Close"; 
